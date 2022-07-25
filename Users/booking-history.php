@@ -1,3 +1,15 @@
+<?php
+session_start();
+if (isset($_SESSION['UserID'])) {
+  $redirectFile = 'profile.php';
+  $redirectName = 'Profile';
+} else {
+  $redirectFile = 'login.php';
+  $redirectName = 'Login';
+  echo "<script>alert('Please login first.');</script>";
+  echo "<script>window.location = 'login.php';</script>";
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -51,7 +63,7 @@
   <header class="site-header">
     <div class="wrapper site-header__wrapper">
       <div class="site-header__start">
-        <a href="home.html" class="brand" style="text-decoration: none; color: white;">Zaptos</a>
+        <a href="home.php" class="brand" style="text-decoration: none; color: white;">Zaptos</a>
       </div>
       <div class="site-header__middle">
         <nav class="nav">
@@ -59,28 +71,28 @@
             menu
           </button>
           <ul class="nav__wrapper">
-            <li class="nav__item"><a href="home.html">Home</a></li>
-            <li class="nav__item"><a href="shopping.html">Shopping</a></li>
-            <li class="nav__item"><a href="membership.html">Membership</a></li>
-            <li class="nav__item"><a href="feedback.html">Feedback</a></li>
-            <li class="nav__item"><a href="faq.html">FAQ</a></li>
+            <li class="nav__item"><a href="home.php">Home</a></li>
+            <li class="nav__item"><a href="shopping.php">Shopping</a></li>
+            <li class="nav__item"><a href="membership.php">Membership</a></li>
+            <li class="nav__item"><a href="feedback.php">Feedback</a></li>
+            <li class="nav__item"><a href="faq.php">FAQ</a></li>
           </ul>
         </nav>
       </div>
       <div style="word-spacing: 10px;">
-        <a href="favourite.html" style="text-decoration: none;">
+        <a href="favourite.php" style="text-decoration: none;">
           <i class="fa fa-heart fa-lg" style="color: white;"></i>
         </a>
-        <a href="shopping-cart.html" class="notification">
+        <a href="shopping-cart.php" class="notification">
           <i class="fa fa-shopping-cart fa-lg" style="color: white;"></i>
           <span class="badge">3</span>
         </a>
-        <a href="booking-history.html">
+        <a href="booking-history.php">
           <i class="fa fa-file-text-o fa-lg" style="color: white;"></i>
         </a>
       </div>
       <div class="site-header__end">
-        <a href="login.html" style="color: white;">Sign in</a>
+        <a href=<?php echo $redirectFile; ?> style="color: white;"><?php echo $redirectName; ?></a>
       </div>
     </div>
   </header>
@@ -95,10 +107,10 @@
       </div>
     </div>
     <div class="btn-group-center" role="group" aria-label="Basic example" style="text-align: center;">
-      <a href="booking-history.html">
+      <a href="booking-history.php">
         <button type="button" class="btn btn-secondary" style="background-color: #008a9a;">Booking</button>
       </a>
-      <a href="shopping-history.html">
+      <a href="shopping-history.php">
         <button type="button" class="btn btn-secondary" style="background-color: #005C67;">Shopping</button>
       </a>
     </div><br>
@@ -115,7 +127,7 @@
               </div>
               <div class="col">12/12/2020</div>
               <div class="col">Pending</div>
-              <div class="col">3000 MMK <a href="booking-receipt.html"><span class="close">&rarr;</span></a></div>
+              <div class="col">3000 MMK <a href="booking-receipt.php"><span class="close">&rarr;</span></a></div>
             </div>
           </div>
           <div class="row">
@@ -128,7 +140,7 @@
               </div>
               <div class="col">12/12/2020</div>
               <div class="col">Pending</div>
-              <div class="col">3000 MMK <a href="booking-receipt.html"><span class="close">&rarr;</span></a></div>
+              <div class="col">3000 MMK <a href="booking-receipt.php"><span class="close">&rarr;</span></a></div>
             </div>
           </div>
           <div class="row border-top border-bottom">
@@ -141,7 +153,7 @@
               </div>
               <div class="col">12/12/2020</div>
               <div class="col">Finished</div>
-              <div class="col">3000 MMK <a href="booking-receipt.html"><span class="close">&rarr;</span>></a></div>
+              <div class="col">3000 MMK <a href="booking-receipt.php"><span class="close">&rarr;</span>></a></div>
             </div>
           </div>
           <div class="row border-top border-bottom">

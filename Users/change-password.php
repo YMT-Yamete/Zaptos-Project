@@ -1,3 +1,48 @@
+<?php
+include 'connect.php';
+session_start();
+if (isset($_SESSION['UserID'])) {
+  $redirectFile = 'profile.php';
+  $redirectName = 'Profile';
+} else {
+  $redirectFile = 'login.php';
+  $redirectName = 'Login';
+  echo "<script>alert('Please login first.');</script>";
+  echo "<script>window.location = 'login.php';</script>";
+}
+
+if (isset($_POST['btnSubmit'])) {
+  $id = $_SESSION['UserID'];
+  $newPassword = sha1($_POST['inputNewPw']);
+  $oldPassword = sha1($_POST['inputOldPw']);
+  
+  $select = "SELECT * FROM Users
+            WHERE UserID = '$id'";
+  $query = $connection->query($select);
+  if ($query->num_rows > 0) {
+    while ($row = $query->fetch_assoc()) {
+      $pwInDB = $row['Password'];
+    }
+  }
+
+  if ($oldPassword == $pwInDB) {
+    $update = "UPDATE Users
+              SET Password = '$newPassword'
+              WHERE UserID = '$id'";
+    if ($connection->query($update)) {
+      echo "<script>alert('Password Changed.');</script>";
+      echo "<script>window.location = 'change-password.php';</script>";
+    }
+    else {
+      echo $connection->error;
+    }
+  }
+  else {
+    echo "<script>alert('Old password incorrect.');</script>";
+    echo "<script>window.location = 'change-password.php';</script>";
+  }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,30 +51,16 @@
   <title>Zaptos</title>
 
   <!-- boostrap 4 -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
   <!-- boostrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
-    integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
-    crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 
   <!-- css -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -50,7 +81,7 @@
   <header class="site-header">
     <div class="wrapper site-header__wrapper">
       <div class="site-header__start">
-        <a href="home.html" class="brand" style="text-decoration: none; color: white;">Zaptos</a>
+        <a href="home.php" class="brand" style="text-decoration: none; color: white;">Zaptos</a>
       </div>
       <div class="site-header__middle">
         <nav class="nav">
@@ -58,28 +89,28 @@
             menu
           </button>
           <ul class="nav__wrapper">
-            <li class="nav__item"><a href="home.html" style="background-color: #008a9a">Home</a></li>
-            <li class="nav__item"><a href="shopping.html">Shopping</a></li>
-            <li class="nav__item"><a href="membership.html">Membership</a></li>
-            <li class="nav__item"><a href="feedback.html">Feedback</a></li>
-            <li class="nav__item"><a href="faq.html">FAQ</a></li>
+            <li class="nav__item"><a href="home.php" style="background-color: #008a9a">Home</a></li>
+            <li class="nav__item"><a href="shopping.php">Shopping</a></li>
+            <li class="nav__item"><a href="membership.php">Membership</a></li>
+            <li class="nav__item"><a href="feedback.php">Feedback</a></li>
+            <li class="nav__item"><a href="faq.php">FAQ</a></li>
           </ul>
         </nav>
       </div>
       <div style="word-spacing: 10px;">
-        <a href="favourite.html" style="text-decoration: none;">
+        <a href="favourite.php" style="text-decoration: none;">
           <i class="fa fa-heart fa-lg" style="color: white;"></i>
         </a>
-        <a href="shopping-cart.html" class="notification">
+        <a href="shopping-cart.php" class="notification">
           <i class="fa fa-shopping-cart fa-lg" style="color: white;"></i>
           <span class="badge">3</span>
         </a>
-        <a href="booking-history.html">
+        <a href="booking-history.php">
           <i class="fa fa-file-text-o fa-lg" style="color: white;"></i>
         </a>
       </div>
       <div class="site-header__end">
-        <a href="login.html" style="color: white;">Sign in</a>
+        <a href=<?php echo $redirectFile; ?> style="color: white;"><?php echo $redirectName; ?></a>
       </div>
     </div>
   </header>
@@ -96,19 +127,19 @@
       <table class="center">
         <tr>
           <td>
-            <form>
+            <form action="change-password.php" method="POST">
               <div class="mb-3">
                 <label for="NewPassword" class="form-label">New Password</label>
-                <input type="Password" class="form-control" required>
+                <input type="Password" class="form-control" name="inputNewPw" required>
               </div>
               <hr>
               <div class="mb-3">
                 <label for="OldPassword" class="form-label">Old Password</label>
-                <input type="Password" class="form-control" required>
+                <input type="Password" class="form-control" name="inputOldPw" required>
               </div>
               <p style="color: red;">Enter your old password to save changes.</p>
-              <button type="submit" class="btn btn-primary" style="background-color: #005C67;">Save</button>
-              &ensp;<a href="profile.html">Edit Profile</a>
+              <button type="submit" class="btn btn-primary" style="background-color: #005C67;" name="btnSubmit">Save</button>
+              &ensp;<a href="profile.php">Edit Profile</a>
             </form>
           </td>
         </tr>

@@ -41,22 +41,22 @@
                     <span class="sr-only">Toggle Menu</span>
                 </button>
             </div>
-            <h1><a href="index.html" class="logo">Zaptos</a></h1>
+            <h1><a href="index.php" class="logo">Zaptos</a></h1>
             <ul class="list-unstyled components mb-5">
                 <li>
                     <a href="#"><span class="fa fa-users mr-3"></span> Users</a>
                     <ul>
                         <li>
-                            <a href="index.html">Users</a>
+                            <a href="index.php">Users</a>
                         </li>
                         <li>
-                            <a href="membership.html">Members</a>
+                            <a href="membership.php">Members</a>
                         </li>
                         <li>
-                            <a href="membership-applications.html">Membership Application</a>
+                            <a href="membership-applications.php">Membership Application</a>
                         </li>
                         <li>
-                            <a href="feedback.html">Feedbacks</a>
+                            <a href="feedback.php">Feedbacks</a>
                         </li>
                     </ul>
                 </li>
@@ -64,10 +64,10 @@
                     <a href="#"><span class="fa fa-sticky-note mr-3"></span> Bookings</a>
                     <ul>
                         <li>
-                            <a href="bookings.html">Bookings</a>
+                            <a href="bookings.php">Bookings</a>
                         </li>
                         <li>
-                            <a href="booking-history.html">Booking History</a>
+                            <a href="booking-history.php">Booking History</a>
                         </li>
                     </ul>
                 </li>
@@ -75,16 +75,16 @@
                     <a href="#"><span class="fa fa-gift mr-3"></span> Sales</a>
                     <ul>
                         <li>
-                            <a href="stocks.html">Stocks</a>
+                            <a href="stocks.php">Stocks</a>
                         </li>
                         <li>
-                            <a href="orders.html">Orders</a>
+                            <a href="orders.php">Orders</a>
                         </li>
                         <li class="active">
-                            <a href="shipped-orders.html">Shipped Orders</a>
+                            <a href="shipped-orders.php">Shipped Orders</a>
                         </li>
                         <li>
-                            <a href="order-history.html">Order History</a>
+                            <a href="order-history.php">Order History</a>
                         </li>
                 </li>
             </ul>

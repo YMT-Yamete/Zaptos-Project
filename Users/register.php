@@ -1,3 +1,28 @@
+<?php
+include 'connect.php';
+include 'auto-id.php';
+session_start();
+if (isset($_POST['btnSubmit'])) {
+  $id = AutoID('U', 6, 'Users', 'UserID');
+  $name = $_POST['inputName'];
+  $phone = $_POST['inputPhone'];
+  $email = $_POST['inputEmail'];
+  $password = sha1($_POST['inputPassword']);
+  $repeatPassword = sha1($_POST['inputRepeatPassword']);
+
+  if ($password == $repeatPassword) {
+    $insert = "INSERT INTO Users VALUES ('$id', '$name', '$email', '$password', '$phone');";
+    if ($connection->query($insert)) {
+      echo "<script>alert('Account Created Successfully');</script>";
+    } else {
+      echo $connection->error;
+    }
+  } else {
+    echo "<script>alert('Password and Repeat Password do not match.');</script>";
+  }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,30 +31,16 @@
   <title>Zaptos</title>
 
   <!-- boostrap 4 -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
   <!-- boostrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
-    integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
-    crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 
   <!-- css -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -50,7 +61,7 @@
   <header class="site-header">
     <div class="wrapper site-header__wrapper">
       <div class="site-header__start">
-        <a href="home.html" class="brand" style="text-decoration: none; color: white;">Zaptos</a>
+        <a href="home.php" class="brand" style="text-decoration: none; color: white;">Zaptos</a>
       </div>
       <div class="site-header__middle">
         <nav class="nav">
@@ -58,28 +69,28 @@
             menu
           </button>
           <ul class="nav__wrapper">
-            <li class="nav__item"><a href="home.html" style="background-color: #008a9a">Home</a></li>
-            <li class="nav__item"><a href="shopping.html">Shopping</a></li>
-            <li class="nav__item"><a href="membership.html">Membership</a></li>
-            <li class="nav__item"><a href="feedback.html">Feedback</a></li>
-            <li class="nav__item"><a href="faq.html">FAQ</a></li>
+            <li class="nav__item"><a href="home.php" style="background-color: #008a9a">Home</a></li>
+            <li class="nav__item"><a href="shopping.php">Shopping</a></li>
+            <li class="nav__item"><a href="membership.php">Membership</a></li>
+            <li class="nav__item"><a href="feedback.php">Feedback</a></li>
+            <li class="nav__item"><a href="faq.php">FAQ</a></li>
           </ul>
         </nav>
       </div>
       <div style="word-spacing: 10px;">
-        <a href="favourite.html" style="text-decoration: none;">
+        <a href="favourite.php" style="text-decoration: none;">
           <i class="fa fa-heart fa-lg" style="color: white;"></i>
         </a>
-        <a href="shopping-cart.html" class="notification">
+        <a href="shopping-cart.php" class="notification">
           <i class="fa fa-shopping-cart fa-lg" style="color: white;"></i>
           <span class="badge">3</span>
         </a>
-        <a href="booking-history.html">
+        <a href="booking-history.php">
           <i class="fa fa-file-text-o fa-lg" style="color: white;"></i>
         </a>
       </div>
       <div class="site-header__end">
-        <a href="login.html" style="color: white;">Sign in</a>
+        <a href="login.php" style="color: white;">Login</a>
       </div>
     </div>
   </header>
@@ -96,29 +107,29 @@
       <table class="center">
         <tr>
           <td>
-            <form>
+            <form action="register.php" method="POST">
               <div class="mb-3">
                 <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" required>
+                <input type="text" class="form-control" name="inputName" required>
               </div>
               <div class="mb-3">
                 <label for="Phone" class="form-label">Phone</label>
-                <input type="text" class="form-control" required>
+                <input type="number" class="form-control" name="inputPhone" required>
               </div>
               <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" required>
+                <input type="email" class="form-control" name="inputEmail" required>
               </div>
               <div class="mb-3">
                 <label for="Password" class="form-label">Password</label>
-                <input type="Password" class="form-control" required>
+                <input type="Password" class="form-control" name="inputPassword" required>
               </div>
               <div class="mb-3">
                 <label for="Password" class="form-label">Repeat Password</label>
-                <input type="Password" class="form-control" required>
+                <input type="Password" class="form-control" name="inputRepeatPassword" required>
               </div>
-              <button type="submit" class="btn btn-primary" style="background-color: #005C67;">Register</button>
-              &ensp;<a href="login.html">Already have an account.</a>
+              <button type="submit" class="btn btn-primary" name="btnSubmit" style="background-color: #005C67;">Register</button>
+              &ensp;<a href="login.php">Already have an account.</a>
             </form>
           </td>
         </tr>

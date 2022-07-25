@@ -1,3 +1,13 @@
+<?php
+session_start();
+if (isset($_SESSION['UserID'])) {
+  $redirectFile = 'profile.php';
+  $redirectName = 'Profile';
+} else {
+  $redirectFile = 'login.php';
+  $redirectName = 'Login';
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -48,7 +58,7 @@
   <header class="site-header">
     <div class="wrapper site-header__wrapper">
       <div class="site-header__start">
-        <a href="home.html" class="brand" style="text-decoration: none; color: white;">Zaptos</a>
+        <a href="home.php" class="brand" style="text-decoration: none; color: white;">Zaptos</a>
       </div>
       <div class="site-header__middle">
         <nav class="nav">
@@ -56,28 +66,28 @@
             menu
           </button>
           <ul class="nav__wrapper">
-            <li class="nav__item"><a href="home.html">Home</a></li>
-            <li class="nav__item"><a href="shopping.html">Shopping</a></li>
-            <li class="nav__item"><a href="membership.html">Membership</a></li>
-            <li class="nav__item"><a href="feedback.html">Feedback</a></li>
-            <li class="nav__item"><a href="faq.html" style="background-color: #008a9a">FAQ</a></li>
+            <li class="nav__item"><a href="home.php">Home</a></li>
+            <li class="nav__item"><a href="shopping.php">Shopping</a></li>
+            <li class="nav__item"><a href="membership.php">Membership</a></li>
+            <li class="nav__item"><a href="feedback.php">Feedback</a></li>
+            <li class="nav__item"><a href="faq.php" style="background-color: #008a9a">FAQ</a></li>
           </ul>
         </nav>
       </div>
       <div style="word-spacing: 10px;">
-        <a href="favourite.html" style="text-decoration: none;">
+        <a href="favourite.php" style="text-decoration: none;">
           <i class="fa fa-heart fa-lg" style="color: white;"></i>
         </a>
-        <a href="shopping-cart.html" class="notification">
+        <a href="shopping-cart.php" class="notification">
           <i class="fa fa-shopping-cart fa-lg" style="color: white;"></i>
           <span class="badge">3</span>
         </a>
-        <a href="booking-history.html">
+        <a href="booking-history.php">
           <i class="fa fa-file-text-o fa-lg" style="color: white;"></i>
         </a>
       </div>
       <div class="site-header__end">
-        <a href="login.html" style="color: white;">Sign in</a>
+        <a href=<?php echo $redirectFile; ?> style="color: white;"><?php echo $redirectName; ?></a>
       </div>
     </div>
   </header>
@@ -133,7 +143,7 @@
         <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
           data-bs-parent="#accordionExample">
           <div class="accordion-body">
-            <span style="font-weight: bold;">Answer: </span>You can contact us via <a href="feedback.html"><span
+            <span style="font-weight: bold;">Answer: </span>You can contact us via <a href="feedback.php"><span
                 style="color: blue;">Feedback</span></a> page, explaining the details. We will reach you out through
             phone or email.
           </div>
@@ -149,7 +159,7 @@
         <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingThree"
           data-bs-parent="#accordionExample">
           <div class="accordion-body">
-            <span style="font-weight: bold;">Answer: </span>Visit <a href="membership.html"><span
+            <span style="font-weight: bold;">Answer: </span>Visit <a href="membership.php"><span
                 style="color: blue;">Membership</span></a> page. Choose what type of membership plan do you want. Fill
             up the form. And make payment through KBZpay by scanning a QR code. Upload the payment screenshot and submit
             the form.

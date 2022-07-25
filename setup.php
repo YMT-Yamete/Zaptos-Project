@@ -140,7 +140,7 @@
                 UserID varchar(30) NOT NULL,
                 ServiceID int NOT NULL,
                 Date date,
-                Time time,
+                Time varchar(30),
                 Discount int,
                 Cost int,
                 BookingStatus varchar(30),
