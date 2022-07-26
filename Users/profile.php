@@ -8,23 +8,16 @@ if (isset($_SESSION['UserID'])) {
 
   $id = $_SESSION['UserID'];
   $select = "SELECT * FROM Users
+              LEFT JOIN Memberships
+              USING (UserID)
               WHERE UserID = '$id'";
   $query = $connection->query($select);
   while ($row = $query->fetch_assoc()) {
+    $row['MembershipStatus'] = ($row['MembershipStatus'] == null) ? 'None' : $row['MembershipStatus'];
     $name = $row['Name'];
     $phone = $row['Phone'];
     $email = $row['Email'];
-  }
-
-  $selectMembership = "SELECT * FROM Memberships
-                      WHERE UserID = '$id'";
-  $queryMembership = $connection->query($selectMembership);
-  if ($queryMembership->num_rows > 0) {
-    while ($rowMembership = $query->fetch_assoc()) {
-      $membershipStatus = $rowMembership['MembershipStatus'];
-    }
-  } else {
-    $membershipStatus = "None";
+    $membershipStatus = $row['MembershipStatus'];
   }
 } else {
   $redirectFile = 'login.php';
@@ -45,8 +38,7 @@ if (isset($_POST['btnSubmit'])) {
   if ($connection->query($update)) {
     echo "<script>alert('Profile Updated');</script>";
     echo "<script>window.location = 'profile.php';</script>";
-  }
-  else {
+  } else {
     echo $connection->error;
   }
 }
@@ -136,22 +128,22 @@ if (isset($_POST['btnSubmit'])) {
         <tr>
           <td>
             <form action="profile.php" method="POST">
-              <input type="text" class="form-control" value=<?php echo $id ?> name="inputID" hidden>
+              <input type="text" class="form-control" value='<?php echo $id ?>' name="inputID" hidden>
               <div class="mb-3">
                 <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" value=<?php echo $name ?> name="inputName" required>
+                <input type="text" class="form-control" value='<?php echo $name ?>' name="inputName" required>
               </div>
               <div class="mb-3">
                 <label for="Phone" class="form-label">Phone</label>
-                <input type="text" class="form-control" value=<?php echo $phone ?> name="inputPhone" required>
+                <input type="text" class="form-control" value='<?php echo $phone ?>' name="inputPhone" required>
               </div>
               <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" value=<?php echo $email ?> readonly>
+                <input type="email" class="form-control" value='<?php echo $email ?>' readonly>
               </div>
               <div class="mb-3">
                 <label for="Membership" class="form-label">Membership</label>
-                <input type="text" class="form-control" value=<?php echo $membershipStatus ?> readonly>
+                <input type="text" class="form-control" value='<?php echo $membershipStatus ?>' readonly>
               </div>
               <hr>
               <div class="mb-3">

@@ -131,7 +131,7 @@ if (isset($_SESSION['UserID'])) {
                 </ul>
               </div>
               <div class="generic_price_btn clearfix">
-                <a class="" href="membership-form.php">Apply</a>
+                <a class="" href="membership-form.php?membershipPlanID=1">Apply</a>
               </div>
             </div>
           </div>
@@ -161,7 +161,7 @@ if (isset($_SESSION['UserID'])) {
                 </ul>
               </div>
               <div class="generic_price_btn clearfix">
-                <a class="" href="membership-form.php">Apply</a>
+                <a class="" href="membership-form.php?membershipPlanID=2">Apply</a>
               </div>
             </div>
           </div>
@@ -190,7 +190,7 @@ if (isset($_SESSION['UserID'])) {
                 </ul>
               </div>
               <div class="generic_price_btn clearfix">
-                <a class="" href="membership-form.php">Apply</a>
+                <a class="" href="membership-form.php?membershipPlanID=3">Apply</a>
               </div>
             </div>
           </div>

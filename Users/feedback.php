@@ -1,13 +1,43 @@
 <?php
+include 'connect.php';
+include 'auto-id.php';
 session_start();
+// fetch data
 if (isset($_SESSION['UserID'])) {
   $redirectFile = 'profile.php';
   $redirectName = 'Profile';
+  $id = $_SESSION['UserID'];
+  $select = "SELECT * FROM Users
+              WHERE UserID = '$id'";
+  $query = $connection->query($select);
+  while ($row = $query->fetch_assoc()) {
+    $name = $row['Name'];
+    $email = $row['Email'];
+    $phone = $row['Phone'];
+  }
 } else {
   $redirectFile = 'login.php';
   $redirectName = 'Login';
   echo "<script>alert('Please login first.');</script>";
   echo "<script>window.location = 'login.php';</script>";
+}
+
+// form submit
+if (isset($_POST['btnSubmit'])) {
+  $userID = $_SESSION['UserID'];
+  $feedbackID = AutoID('F', 6, 'Feedbacks', 'FeedbackID');
+  $name = $_POST['inputName'];
+  $feedback = $_POST['inputFeedback'];
+  $date = date("Y-m-d");
+
+  $insert = "INSERT INTO Feedbacks VALUES ('$feedbackID', '$userID', '$feedback', '$date')";
+  if ($connection->query($insert)) {
+    echo "<script>alert('Thank you for your feedback. We will reach you out soon if needed.');</script>";
+    echo "<script>window.location = 'feedback.php';</script>";
+  } 
+  else {
+    echo $connection->error;
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -18,30 +48,16 @@ if (isset($_SESSION['UserID'])) {
   <title>Zaptos</title>
 
   <!-- boostrap 4 -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
   <!-- boostrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
-    integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
-    crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 
   <!-- css -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -107,35 +123,37 @@ if (isset($_SESSION['UserID'])) {
     <div class="row">
       <h4 style="text-align:center">We'd love to hear feedbacks or complaints from you!</h4>
     </div>
-    <div class="row input-container">
-      <div class="col-xs-12">
-        <div class="styled-input wide">
-          <input type="text" required />
+    <form action="feedback.php" method="POST">
+      <div class="row input-container">
+        <div class="col-xs-12">
           <label>Name</label>
+          <div class="styled-input wide">
+            <input type="text" name="inputName" value='<?php echo $name; ?>' readonly />
+          </div>
         </div>
-      </div>
-      <div class="col-md-6 col-sm-12">
-        <div class="styled-input">
-          <input type="text" required />
+        <div class="col-md-6 col-sm-12">
           <label>Email</label>
+          <div class="styled-input">
+            <input type="text" name="inputEmail" value='<?php echo $email; ?>' readonly />
+          </div>
+        </div>
+        <div class="col-md-6 col-sm-12">
+          <label>Phone</label>
+          <div class="styled-input" style="float:right;">
+            <input type="text" name="inputPhone" value='<?php echo $phone; ?>' readonly />
+          </div>
+        </div>
+        <div class="col-xs-12">
+          <div class="styled-input wide">
+            <textarea name="inputFeedback" required></textarea>
+            <label>Message</label>
+          </div>
+        </div>
+        <div class="col-xs-12">
+          <button type="submit" class="btn-lrg submit-btn" style="background-color: #005C67; border: none;" name="btnSubmit">Send Feedback</button>
         </div>
       </div>
-      <div class="col-md-6 col-sm-12">
-        <div class="styled-input" style="float:right;">
-          <input type="text" required />
-          <label>Phone Number</label>
-        </div>
-      </div>
-      <div class="col-xs-12">
-        <div class="styled-input wide">
-          <textarea required></textarea>
-          <label>Message</label>
-        </div>
-      </div>
-      <div class="col-xs-12">
-        <div class="btn-lrg submit-btn">Send Message</div>
-      </div>
-    </div>
+    </form>
   </div>
 
 

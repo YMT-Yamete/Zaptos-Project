@@ -1,3 +1,48 @@
+<?php
+include 'connect.php';
+session_start();
+if (isset($_SESSION['AdminID'])) {
+    $select = "SELECT * FROM Memberships m, Users u, MembershipTypes mt
+                WHERE m.UserID = u.UserID
+                AND m.MembershipTypeID = mt.MembershipTypeID
+                AND m.MembershipStatus = 'Pending'";
+    $query = $connection->query($select);
+} else {
+    echo "<script>window.location = 'login.php'</script>";
+}
+
+if (isset($_POST['btnAccept'])) {
+    $membershipID = $_POST['inputMembershipID'];
+    $startDate = date("Y-m-d");
+    $duration = $_POST['inputDuration'];
+    $endDate = date('Y-m-d', strtotime($startDate . ' + '. $duration));
+    $update = "UPDATE Memberships
+                SET MembershipStatus = 'Active',
+                StartDate = '$startDate',
+                EndDate = '$endDate'
+                WHERE MembershipID = '$membershipID'";
+    $updateQuery = $connection->query($update);
+    if ($updateQuery) {
+        echo "<script>alert('Membership Application Accepted');</script>";
+        echo "<script>window.location = 'membership-applications.php'</script>";
+    }
+    else {
+        echo $connection->error;
+    }
+}   
+
+if (isset($_POST['btnDecline'])) {
+    $membershipID = $_POST['inputMembershipID'];
+    $delete = "DELETE FROM Memberships WHERE MembershipID = '$membershipID'";
+    if ($connection->query($delete)) {
+        echo "<script>alert('Membership Application Declined');</script>";
+        echo "<script>window.location = 'membership-applications.php'</script>";
+    }
+    else {
+        echo $connection->error;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,29 +55,21 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <!-- boostrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
-        integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
-        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
-        crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 
     <!-- css -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/overlay.css">
 
     <!-- data tables -->
-    <link rel="stylesheet" type="text/css"
-        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css">
 </head>
 
 <body>
-
     <div class="wrapper d-flex align-items-stretch">
         <nav id="sidebar">
             <div class="custom-menu">
@@ -86,74 +123,56 @@
                         <li>
                             <a href="order-history.php">Order History</a>
                         </li>
+                    </ul>
                 </li>
-            </ul>
+                <li style="text-align:center;">
+                    <br>
+                    <a href="logout.php"><button type="submit" class="btn" name="btnSubmit" style="background-color: #005C67; color: white;">Logout</button></a>
+                </li>
             </ul>
         </nav>
 
         <div id="content" class="p-4 p-md-5 pt-5">
             <div class="container">
                 <h2 class="pageHeader">Membership Applications</h2>
-                <table id="tableID" class="table table-bordered table-striped table-responsive-stack">
-                    <thead class="tableHeaders">
-                        <tr>
-                            <th>MemberID</th>
-                            <th>UserID</th>
-                            <th>Name</th>
-                            <th>Membership Plan</th>
-                            <th>Payment</th>
-                            <th>Accept</th>
-                            <th>Decline</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>M-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Basic</td>
-                            <td><a href="">View Payment</a></td>
-                            <td><a href="">Accept</a></td>
-                            <td><a href="">Decline</a></td>
-                        </tr>
-                        <tr>
-                            <td>M-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Basic</td>
-                            <td><a href="">View Payment</a></td>
-                            <td><a href="">Accept</a></td>
-                            <td><a href="">Decline</a></td>
-                        </tr>
-                        <tr>
-                            <td>M-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Basic</td>
-                            <td><a href="">View Payment</a></td>
-                            <td><a href="">Accept</a></td>
-                            <td><a href="">Decline</a></td>
-                        </tr>
-                        <tr>
-                            <td>M-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Basic</td>
-                            <td><a href="">View Payment</a></td>
-                            <td><a href="">Accept</a></td>
-                            <td><a href="">Decline</a></td>
-                        </tr>
-                        <tr>
-                            <td>M-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Basic</td>
-                            <td><a href="">View Payment</a></td>
-                            <td><a href="">Accept</a></td>
-                            <td><a href="">Decline</a></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <form action="membership-applications.php" method="POST">
+                    <table id="tableID" class="table table-bordered table-striped table-responsive-stack">
+                        <thead class="tableHeaders">
+                            <tr>
+                                <th>MemberID</th>
+                                <th>UserID</th>
+                                <th>Name</th>
+                                <th>Membership Plan</th>
+                                <th>Payment</th>
+                                <th>Accept</th>
+                                <th>Decline</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            while ($row = $query->fetch_assoc()) {
+                                echo
+                                "<div id='overlay' onclick='off()'>
+                                    <div id='paymentPhoto'>
+                                        <img src=$row[Payment] width='100%'>
+                                    </div>
+                                </div>
+                                <input type='text' value='$row[MembershipID]' name='inputMembershipID' hidden>
+                                <input type='text' value='$row[Duration]' name='inputDuration' hidden>
+                                <tr>
+                                    <td>$row[MembershipID]</td>
+                                    <td>$row[UserID]</td>
+                                    <td>$row[Name]</td>
+                                    <td>$row[MembershipType]</td>
+                                    <td><a onclick='on()' style='color: #4285F4;'>View Photo</a></td>
+                                    <td><input type='submit' class='actionButton' name='btnAccept' value='Accept'></td>
+                                    <td><input type='submit' class='actionButton' name='btnDecline' value='Decline'></td>
+                                </tr>";
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </form>
             </div>
         </div>
     </div>
@@ -166,9 +185,18 @@
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
     <script type="text/javascript">
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('#tableID').DataTable();
         });
+    </script>
+    <script>
+        function on() {
+            document.getElementById("overlay").style.display = "block";
+        }
+
+        function off() {
+            document.getElementById("overlay").style.display = "none";
+        }
     </script>
 </body>
 

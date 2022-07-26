@@ -48,6 +48,7 @@
     $create = "CREATE TABLE MembershipTypes
                 (MembershipTypeID int NOT NULL PRIMARY KEY,
                 MembershipType varchar(30),
+                Cost int,
                 Duration varchar(30),
                 DiscountPercent int,
                 FreeDeliveryStatus varchar(30),
@@ -60,11 +61,11 @@
     }
 
     // MembershipType Data Add
-    $insert1 = "INSERT INTO MembershipTypes VALUES (1, 'Basic', '6 months', 10, 'Not Free');";
+    $insert1 = "INSERT INTO MembershipTypes VALUES (1, 'Basic', 30000,'6 months', 10, 'Not Free');";
     $query1 = $connection->query($insert1);
-    $insert2 = "INSERT INTO MembershipTypes VALUES (2, 'Standard', '1 year', 10, 'Free');";
+    $insert2 = "INSERT INTO MembershipTypes VALUES (2, 'Standard', 40000, '1 year', 10, 'Free');";
     $query2 = $connection->query($insert2);
-    $insert3 = "INSERT INTO MembershipTypes VALUES (3, 'Premium', '2 years', 15, 'Free');";
+    $insert3 = "INSERT INTO MembershipTypes VALUES (3, 'Premium', 60000, '2 years', 15, 'Free');";
     $query3 = $connection->query($insert3);
     if ($query1 && $query2 && $query3) {
         echo "<script>alert('MembershipTypes Data Inserted');</script>";
