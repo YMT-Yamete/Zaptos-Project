@@ -2,8 +2,25 @@
 include 'connect.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
+    $select = "SELECT * FROM Memberships m, Users u, MembershipTypes mt
+                WHERE m.UserID = u.UserID
+                AND m.MembershipTypeID = mt.MembershipTypeID
+                AND m.MembershipStatus != 'Pending'";
+    $query = $connection->query($select);
 } else {
-  echo "<script>window.location = 'login.php'</script>";
+    echo "<script>window.location = 'login.php'</script>";
+}
+
+if (isset($_POST['btnRemove'])) {
+    $membershipID = $_POST['inputMembershipID'];
+    $delete = "DELETE FROM Memberships WHERE MembershipID = '$membershipID'";
+    if ($connection->query($delete)) {
+        echo "<script>alert('Member Removed');</script>";
+        echo "<script>window.location = 'membership.php'</script>";
+    }
+    else {
+        echo $connection->error;
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -98,66 +115,40 @@ if (isset($_SESSION['AdminID'])) {
         <div id="content" class="p-4 p-md-5 pt-5">
             <div class="container">
                 <h2 class="pageHeader">Members</h2>
-                <table id="tableID" class="table table-bordered table-striped table-responsive-stack">
-                    <thead class="tableHeaders">
-                        <tr>
-                            <th>MemberID</th>
-                            <th>UserID</th>
-                            <th>Name</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>M-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>12.12.2022</td>
-                            <td>12.12.2023</td>
-                            <td>Active</td>
-                            <td><a href="" style="color: red;">Remove Member</a></td>
-                        </tr>
-                        <tr>
-                            <td>M-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>12.12.2022</td>
-                            <td>12.12.2023</td>
-                            <td>Active</td>
-                            <td><a href="" style="color: red;">Remove Member</a></td>
-                        </tr>
-                        <tr>
-                            <td>M-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>12.12.2022</td>
-                            <td>12.12.2023</td>
-                            <td>Active</td>
-                            <td><a href="" style="color: red;">Remove Member</a></td>
-                        </tr>
-                        <tr>
-                            <td>M-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>12.12.2022</td>
-                            <td>12.12.2023</td>
-                            <td>Active</td>
-                            <td><a href="" style="color: red;">Remove Member</a></td>
-                        </tr>
-                        <tr>
-                            <td>M-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>12.12.2022</td>
-                            <td>12.12.2023</td>
-                            <td>Active</td>
-                            <td><a href="" style="color: red;">Remove Member</a></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <form action="membership.php" method="POST">
+                    <table id="tableID" class="table table-bordered table-striped table-responsive-stack">
+                        <thead class="tableHeaders">
+                            <tr>
+                                <th>MemberID</th>
+                                <th>UserID</th>
+                                <th>Name</th>
+                                <th>Membership Plan</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            while ($row = $query->fetch_assoc())
+                                echo
+                                "
+                                <input type='text' name='inputMembershipID' value='$row[MembershipID]' hidden> 
+                                <tr>
+                                    <td>$row[MembershipID]</td>
+                                    <td>$row[UserID]</td>
+                                    <td>$row[Name]</td>
+                                    <td>$row[MembershipType]</td>
+                                    <td>$row[StartDate]</td>
+                                    <td>$row[EndDate]</td>
+                                    <td>$row[MembershipStatus]</td>
+                                    <td><input type='submit' name='btnRemove' value='Remove Member' style='color:red; border:none;'></td>
+                                </tr>";
+                            ?>
+                        </tbody>
+                    </table>
+                </form>
             </div>
         </div>
     </div>

@@ -13,7 +13,9 @@ if (isset($_POST['btnSubmit'])) {
   if ($password == $repeatPassword) {
     $insert = "INSERT INTO Users VALUES ('$id', '$name', '$email', '$password', '$phone');";
     if ($connection->query($insert)) {
+      $_SESSION['UserID'] = $id;
       echo "<script>alert('Account Created Successfully');</script>";
+      echo "<script>window.location = 'home.php'</script>";
     } else {
       echo $connection->error;
     }

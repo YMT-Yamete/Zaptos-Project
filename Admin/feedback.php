@@ -2,6 +2,9 @@
 include 'connect.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
+    $select  = "SELECT * FROM Feedbacks f, Users u
+                WHERE f.UserID = u.UserID";
+    $query = $connection->query($select);
 } else {
   echo "<script>window.location = 'login.php'</script>";
 }
@@ -110,46 +113,20 @@ if (isset($_SESSION['AdminID'])) {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>F-0000001</td>
-                            <td>John</td>
-                            <td>john@gmail.com</td>
-                            <td>12.12.2022</td>
-                            <td>Very Good</td>
-                            <td><a href="feedback-reply.php">Reply</a></td>
-                        </tr>
-                        <tr>
-                            <td>F-0000001</td>
-                            <td>John</td>
-                            <td>john@gmail.com</td>
-                            <td>12.12.2022</td>
-                            <td>Very Good</td>
-                            <td><a href="feedback-reply.php">Reply</a></td>
-                        </tr>
-                        <tr>
-                            <td>F-0000001</td>
-                            <td>John</td>
-                            <td>john@gmail.com</td>
-                            <td>12.12.2022</td>
-                            <td>Very Good</td>
-                            <td><a href="feedback-reply.php">Reply</a></td>
-                        </tr>
-                        <tr>
-                            <td>F-0000001</td>
-                            <td>John</td>
-                            <td>john@gmail.com</td>
-                            <td>12.12.2022</td>
-                            <td>Very Good</td>
-                            <td><a href="feedback-reply.php">Reply</a></td>
-                        </tr>
-                        <tr>
-                            <td>F-0000001</td>
-                            <td>John</td>
-                            <td>john@gmail.com</td>
-                            <td>12.12.2022</td>
-                            <td>Very Good</td>
-                            <td><a href="feedback-reply.php">Reply</a></td>
-                        </tr>
+                    <?php
+                        while ($row = $query->fetch_assoc())
+                        {
+                            echo 
+                            "<tr>
+                                <td>$row[FeedbackID]</td>
+                                <td>$row[UserID]</td>
+                                <td>$row[Name]</td>
+                                <td>$row[Date]</td>
+                                <td>$row[Feedback]</td>
+                                <td><a href='feedback-reply.php?FeedbackID=$row[FeedbackID]'>Reply</a></td>
+                            </tr>";
+                        }
+                    ?>  
                     </tbody>
                 </table>
             </div>
