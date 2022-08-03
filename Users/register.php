@@ -10,6 +10,12 @@ if (isset($_POST['btnSubmit'])) {
   $password = sha1($_POST['inputPassword']);
   $repeatPassword = sha1($_POST['inputRepeatPassword']);
 
+  $select = "SELECT * FROM Users WHERE Email = '$email'";
+  if ($connection->query($select)->num_rows > 0) {
+    echo "<script>alert('This email is already in use.');</script>";
+    echo "<script>window.location = 'register.php'</script>";
+  }
+
   if ($password == $repeatPassword) {
     $insert = "INSERT INTO Users VALUES ('$id', '$name', '$email', '$password', '$phone');";
     if ($connection->query($insert)) {

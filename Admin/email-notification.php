@@ -39,5 +39,3 @@ function EmailNotification($receiver, $subject, $body) {
 		    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
 		}
 	}
-
-?>

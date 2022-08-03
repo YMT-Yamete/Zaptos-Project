@@ -26,5 +26,3 @@
     else {
         echo $connection->error;
     }
-
-?>

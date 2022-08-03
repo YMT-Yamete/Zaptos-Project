@@ -31,15 +31,31 @@ if (isset($_POST['btnSubmit'])) {
   $id = $_POST['inputID'];
   $name = $_POST['inputName'];
   $phone = $_POST['inputPhone'];
-  $update = "UPDATE Users
-            SET Name = '$name',
-            Phone = '$phone'
-            WHERE UserID = '$id'";
-  if ($connection->query($update)) {
-    echo "<script>alert('Profile Updated');</script>";
-    echo "<script>window.location = 'profile.php';</script>";
-  } else {
-    echo $connection->error;
+  $oldPassword = sha1($_POST['inputPassword']);
+
+  $select = "SELECT * FROM Users
+  WHERE UserID = '$id'";
+  $query = $connection->query($select);
+  if ($query->num_rows > 0) {
+    while ($row = $query->fetch_assoc()) {
+      $pwInDB = $row['Password'];
+    }
+  }
+
+  if ($oldPassword == $pwInDB) {
+    $update = "UPDATE Users
+    SET Name = '$name',
+    Phone = '$phone'
+    WHERE UserID = '$id'";
+    if ($connection->query($update)) {
+      echo "<script>alert('Profile Updated');</script>";
+      echo "<script>window.location = 'profile.php';</script>";
+    } else {
+      echo $connection->error;
+    }
+  }
+  else {
+    echo "<script>alert('Password Incorrect');</script>";
   }
 }
 ?>
@@ -147,8 +163,8 @@ if (isset($_POST['btnSubmit'])) {
               </div>
               <hr>
               <div class="mb-3">
-                <label for="Password" class="form-label" name="inputPassword">Password</label>
-                <input type="Password" class="form-control" required>
+                <label for="Password" class="form-label">Password</label>
+                <input type="Password" class="form-control" name="inputPassword" required>
               </div>
               <p style="color: red;">Enter your old password to save changes.</p>
               <button type="submit" class="btn btn-primary" style="background-color: #005C67;" name="btnSubmit">Save</button>

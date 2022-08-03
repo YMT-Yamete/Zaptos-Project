@@ -42,15 +42,22 @@ if (isset($_POST['btnSubmit'])) {
 
   $membershipStatus = 'Pending';
 
-  $insert = "INSERT INTO Memberships (MembershipID, UserID, MembershipTypeID, Payment, MembershipStatus)
-            VALUES ('$membershipID', '$userID', '$membershipTypeID', '$savedDestination', '$membershipStatus')";
-  
-  if ($connection->query($insert)) {
-    echo "<script>alert('Application Form Submitted. We will reach you out soon.')</script>";
+  $select = "SELECT * FROM Memberships
+            WHERE UserID = '$userID'
+            AND MembershipStatus = 'Pending'
+            OR MembershipStatus = 'Active'";
+  if ($connection->query($select)->num_rows > 0) {
+    echo "<script>alert('You cannot submit application form right now.')</script>";
     echo "<script>window.location = 'home.php';</script>";
-  }
-  else {
-    echo $connection->error;
+  } else {
+    $insert = "INSERT INTO Memberships (MembershipID, UserID, MembershipTypeID, Payment, MembershipStatus)
+    VALUES ('$membershipID', '$userID', '$membershipTypeID', '$savedDestination', '$membershipStatus')";
+    if ($connection->query($insert)) {
+      echo "<script>alert('Application Form Submitted. We will reach you out soon.')</script>";
+      echo "<script>window.location = 'home.php';</script>";
+    } else {
+      echo $connection->error;
+    }
   }
 }
 ?>

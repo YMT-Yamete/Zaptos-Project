@@ -17,8 +17,7 @@ if (isset($_POST['btnRemove'])) {
     if ($connection->query($delete)) {
         echo "<script>alert('Member Removed');</script>";
         echo "<script>window.location = 'membership.php'</script>";
-    }
-    else {
+    } else {
         echo $connection->error;
     }
 }

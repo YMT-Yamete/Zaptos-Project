@@ -15,7 +15,7 @@ if (isset($_POST['btnAccept'])) {
     $membershipID = $_POST['inputMembershipID'];
     $startDate = date("Y-m-d");
     $duration = $_POST['inputDuration'];
-    $endDate = date('Y-m-d', strtotime($startDate . ' + '. $duration));
+    $endDate = date('Y-m-d', strtotime($startDate . ' + ' . $duration));
     $update = "UPDATE Memberships
                 SET MembershipStatus = 'Active',
                 StartDate = '$startDate',
@@ -25,11 +25,10 @@ if (isset($_POST['btnAccept'])) {
     if ($updateQuery) {
         echo "<script>alert('Membership Application Accepted');</script>";
         echo "<script>window.location = 'membership-applications.php'</script>";
-    }
-    else {
+    } else {
         echo $connection->error;
     }
-}   
+}
 
 if (isset($_POST['btnDecline'])) {
     $membershipID = $_POST['inputMembershipID'];
@@ -37,8 +36,7 @@ if (isset($_POST['btnDecline'])) {
     if ($connection->query($delete)) {
         echo "<script>alert('Membership Application Declined');</script>";
         echo "<script>window.location = 'membership-applications.php'</script>";
-    }
-    else {
+    } else {
         echo $connection->error;
     }
 }

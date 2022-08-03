@@ -6,7 +6,7 @@ if (isset($_SESSION['AdminID'])) {
                 WHERE f.UserID = u.UserID";
     $query = $connection->query($select);
 } else {
-  echo "<script>window.location = 'login.php'</script>";
+    echo "<script>window.location = 'login.php'</script>";
 }
 ?>
 <!DOCTYPE html>
@@ -113,10 +113,9 @@ if (isset($_SESSION['AdminID'])) {
                         </tr>
                     </thead>
                     <tbody>
-                    <?php
-                        while ($row = $query->fetch_assoc())
-                        {
-                            echo 
+                        <?php
+                        while ($row = $query->fetch_assoc()) {
+                            echo
                             "<tr>
                                 <td>$row[FeedbackID]</td>
                                 <td>$row[UserID]</td>
@@ -126,7 +125,7 @@ if (isset($_SESSION['AdminID'])) {
                                 <td><a href='feedback-reply.php?FeedbackID=$row[FeedbackID]'>Reply</a></td>
                             </tr>";
                         }
-                    ?>  
+                        ?>
                     </tbody>
                 </table>
             </div>

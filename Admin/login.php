@@ -13,15 +13,15 @@ if (isset($_POST['btnSubmit'])) {
     $query = $connection->query($select);
     $count = $query->num_rows;
     if ($count > 0) {
-      $adminArray = $query->fetch_array();
-      $_SESSION['AdminID'] = $adminArray['AdminID'];
-      echo "<script>alert('Login Successful');</script>";
-      echo "<script>window.location = 'index.php'</script>";
+        $adminArray = $query->fetch_array();
+        $_SESSION['AdminID'] = $adminArray['AdminID'];
+        echo "<script>alert('Login Successful');</script>";
+        echo "<script>window.location = 'index.php'</script>";
     } else {
-      echo "<script>alert('Username or Password Incorrect');</script>";
-      echo "<script>window.location = 'login.php'</script>";
+        echo "<script>alert('Username or Password Incorrect');</script>";
+        echo "<script>window.location = 'login.php'</script>";
     }
-  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

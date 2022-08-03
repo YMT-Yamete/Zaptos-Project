@@ -111,11 +111,11 @@ if (isset($_POST['btnSubmit'])) {
         <div id="content" class="p-4 p-md-5 pt-5">
             <div class="container">
                 <form action="feedback-reply.php" method="POST">
-                <h2 class="pageHeader">Feedback Reply</h2><br>
-                <?php
-                while ($row = $query->fetch_assoc()) {
-                    echo
-                    "<h5>$row[Name]'s Feedback</h5>
+                    <h2 class="pageHeader">Feedback Reply</h2><br>
+                    <?php
+                    while ($row = $query->fetch_assoc()) {
+                        echo
+                        "<h5>$row[Name]'s Feedback</h5>
                         <div class='mb-3'>
                             <label for='exampleFormControlTextarea1' class='form-label'>Feedback</label><br>
                             <textarea name='' id='' style='width: 100%; border-color: #ced4da;' rows='5' readonly>$row[Feedback]</textarea>
@@ -124,17 +124,17 @@ if (isset($_POST['btnSubmit'])) {
                             <label for='exampleFormControlInput1' class='form-label'>Email address</label>
                             <input type='email' class='form-control' name='inputEmail' value=$row[Email] readonly>
                         </div>";
-                }
-                ?>
-                <div class="mb-3">
-                    <label for="subject" class="form-label">Subject</label>
-                    <input type="text" class="form-control" name="inputSubject" placeholder="Enter subject here">
-                </div>
-                <div class="mb-3">
-                    <label for="email text" class="form-label">Email Text</label><br>
-                    <textarea style="width: 100%; border-color: #ced4da;" name="inputReply" rows="5"></textarea>
-                </div>
-                <button type="submit" class="btn" name="btnSubmit" style="background-color: #005C67; color: white;">Reply via Email</button>
+                    }
+                    ?>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" name="inputSubject" placeholder="Enter subject here" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email text" class="form-label">Email Text</label><br>
+                        <textarea style="width: 100%; border-color: #ced4da;" name="inputReply" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn" name="btnSubmit" style="background-color: #005C67; color: white;">Reply via Email</button>
                 </form>
             </div>
         </div>

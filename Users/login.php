@@ -1,6 +1,13 @@
 <?php
 include 'connect.php';
 session_start();
+if (isset($_SESSION['blockTime'])) {
+  $difference = time() - $_SESSION['blockTime'];
+  if ($difference > 30) {
+    unset($_SESSION['blockTime']);
+    unset($_SESSION['loginAttempt']);
+  }
+}
 if (isset($_POST['btnSubmit'])) {
   $email = $_POST['inputEmail'];
   $password = sha1($_POST['inputPassword']);
@@ -15,6 +22,11 @@ if (isset($_POST['btnSubmit'])) {
     echo "<script>alert('Login Successful');</script>";
     echo "<script>window.location = 'home.php'</script>";
   } else {
+    if (!isset($_SESSION['loginAttempt'])) {
+      $_SESSION['loginAttempt'] = 1;
+    } else {
+      $_SESSION['loginAttempt']++;
+    }
     echo "<script>alert('Email or Password Incorrect');</script>";
     echo "<script>window.location = 'login.php'</script>";
   }
@@ -112,7 +124,15 @@ if (isset($_POST['btnSubmit'])) {
               <label for="Password" class="form-label">Password</label>
               <input type="Password" class="form-control" name="inputPassword" required>
             </div>
-            <button type="submit" class="btn btn-primary" name="btnSubmit" style="background-color: #005C67;">Login</button>
+            <?php
+              if (isset($_SESSION['loginAttempt']) && $_SESSION['loginAttempt'] >= 5) {
+                $_SESSION['blockTime'] = time();
+                echo "<p style='color: red;'>Too many login attempt fails. <br>Please wait 30 seconds</p>";
+              }
+              else {
+                echo '<button type="submit" class="btn btn-primary" name="btnSubmit" style="background-color: #005C67;">Login</button>';
+              }
+            ?>
             &ensp;<a href="register.php">I don't have an account.</a>
           </form>
         </td>
