@@ -74,7 +74,7 @@ if (isset($_SESSION['AdminID'])) {
                 <li>
                     <a href="#"><span class="fa fa-gift mr-3"></span> Sales</a>
                     <ul>
-                        <li>
+                        <li class="active">
                             <a href="stocks.php">Stocks</a>
                         </li>
                         <li>

@@ -2,8 +2,27 @@
 include 'connect.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
+  $select = "SELECT b.BookingID, u.UserID, u.Name, s.ServiceName, b.Date, b.Time, b.Discount ,b.Cost 
+            FROM Bookings b, Users u, Services s
+            WHERE b.UserID = u.UserID
+            AND b.ServiceID = s.ServiceID
+            AND b.BookingStatus = 'Pending'";
+  $query = $connection->query($select);
 } else {
   echo "<script>window.location = 'login.php'</script>";
+}
+
+if (isset($_POST['btnFinished'])) {
+  $bookingID = $_POST['inputBookingID'];
+  $update = "UPDATE Bookings 
+            SET BookingStatus = 'Finished' 
+            WHERE BookingID = '$bookingID'";
+  if ($connection->query($update)) {
+    echo "<script>alert('Booking Finished');</script>";
+    echo "<script>window.location = 'bookings.php';</script>";
+  } else {
+    echo $connection->error;
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -98,78 +117,45 @@ if (isset($_SESSION['AdminID'])) {
     <div id="content" class="p-4 p-md-5 pt-5">
       <div class="container">
         <h2 class="pageHeader">Bookings</h2>
-        <table id="tableID" class="table table-bordered table-striped table-responsive-stack">
-          <thead class="tableHeaders">
-            <tr>
-              <th>BookingID</th>
-              <th>UserID</th>
-              <th>Name</th>
-              <th>Service</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Discount</th>
-              <th>Cost</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>B-0000001</td>
-              <td>U-0000001</td>
-              <td>John</td>
-              <td>Basic</td>
-              <td>12.12.2022</td>
-              <td>12:30 am</td>
-              <td>0%</td>
-              <td>1000 MMK</td>
-              <td><a href="">Set As Finished</a></td>
-            </tr>
-            <tr>
-              <td>B-0000001</td>
-              <td>U-0000001</td>
-              <td>John</td>
-              <td>Basic</td>
-              <td>12.12.2022</td>
-              <td>12:30 am</td>
-              <td>0%</td>
-              <td>1000 MMK</td>
-              <td><a href="">Set As Finished</a></td>
-            </tr>
-            <tr>
-              <td>B-0000001</td>
-              <td>U-0000001</td>
-              <td>John</td>
-              <td>Basic</td>
-              <td>12.12.2022</td>
-              <td>12:30 am</td>
-              <td>0%</td>
-              <td>1000 MMK</td>
-              <td><a href="">Set As Finished</a></td>
-            </tr>
-            <tr>
-              <td>B-0000001</td>
-              <td>U-0000001</td>
-              <td>John</td>
-              <td>Basic</td>
-              <td>12.12.2022</td>
-              <td>12:30 am</td>
-              <td>0%</td>
-              <td>1000 MMK</td>
-              <td><a href="">Set As Finished</a></td>
-            </tr>
-            <tr>
-              <td>B-0000001</td>
-              <td>U-0000001</td>
-              <td>John</td>
-              <td>Basic</td>
-              <td>12.12.2022</td>
-              <td>12:30 am</td>
-              <td>0%</td>
-              <td>1000 MMK</td>
-              <td><a href="">Set As Finished</a></td>
-            </tr>
-          </tbody>
-        </table>
+        <form action="bookings.php" method="POST">
+          <table id="tableID" class="table table-bordered table-striped table-responsive-stack">
+            <thead class="tableHeaders">
+              <tr>
+                <th>BookingID</th>
+                <th>UserID</th>
+                <th>Name</th>
+                <th>Service</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Discount</th>
+                <th>Cost</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+              while ($row = $query->fetch_assoc()) {
+                echo
+                '
+              <tr>
+                  <td>' . $row["BookingID"] . '</td>
+                  <td>' . $row["UserID"] . '</td>
+                  <td>' . $row["Name"] . '</td>
+                  <td>' . $row["ServiceName"] . '</td>
+                  <td>' . $row["Date"] . '</td>
+                  <td>' . $row["Time"] . '</td>
+                  <td>' . $row["Discount"] . '% </td>
+                  <td>' . $row["Cost"] . '</td>
+                  <td>
+                  <input type="text" name="inputBookingID" value=' . $row["BookingID"] . ' hidden>
+                  <input type="submit" class="actionButton" name="btnFinished" style="background-color: transparent;" value="Set As Finished">
+                  </td>
+                </tr>';
+              }
+              ?>
+            </tbody>
+          </table>
+        </form>
       </div>
     </div>
   </div>

@@ -1,13 +1,47 @@
 <?php
+include 'connect.php';
 session_start();
 if (isset($_SESSION['UserID'])) {
   $redirectFile = 'profile.php';
   $redirectName = 'Profile';
+
+  if (isset($_GET['BookingID'])) {
+    $userID = $_SESSION['UserID'];
+    $bookingID = $_GET['BookingID'];
+    $select = "SELECT * FROM Bookings b, Users u 
+              WHERE b.UserID = u.UserID
+              AND b.BookingID = '$bookingID'";
+    $query = $connection->query($select);
+    while ($row = $query->fetch_assoc()) {
+      $name = $row['Name'];
+      $email = $row['Email'];
+      $serviceID = $row['ServiceID'];
+      $date = $row['Date'];
+      $time = $row['Time'];
+      $discount = $row['Discount'];
+    }
+    $select = "SELECT * FROM Services WHERE ServiceID = '$serviceID'";
+    $query = $connection->query($select);
+    while ($row = $query->fetch_assoc()) {
+      $service = $row['ServiceName'];
+      $cost = $row['Cost'];
+    }
+    $total = $cost - ($cost * $discount / 100);
+  }
 } else {
   $redirectFile = 'login.php';
   $redirectName = 'Login';
   echo "<script>alert('Please login first.');</script>";
   echo "<script>window.location = 'login.php';</script>";
+}
+
+if (isset($_POST['btnCancel'])) {
+  $bookingID = $_POST['inputBookingID'];
+  $delete = "DELETE FROM Bookings WHERE BookingID = '$bookingID'";
+  if ($connection->query($delete)) {
+    echo "<script>alert('Booking Cancelled.');</script>";
+    echo "<script>window.location = 'booking-history.php';</script>";
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -18,30 +52,16 @@ if (isset($_SESSION['UserID'])) {
   <title>Zaptos</title>
 
   <!-- boostrap 4 -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
   <!-- boostrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
-    integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
-    crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 
   <!-- css -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -109,7 +129,7 @@ if (isset($_SESSION['UserID'])) {
     <div class="card">
       <div class="row">
         <div class="col-md-12 cart p-5">
-          <p style="text-align: center;">B-000001</p>
+          <p style="text-align: center;"><?php echo $bookingID ?></p>
           <hr>
           <table class="center">
             <tr>
@@ -117,35 +137,35 @@ if (isset($_SESSION['UserID'])) {
                 <p style="font-weight: bold">Name - </p>
               </td>
               <td><span style="display: inline-block; margin-left: 100px;"></span></td>
-              <td style="text-align: right;">Someone</td>
+              <td style="text-align: right;"><?php echo $name ?></td>
             </tr>
             <tr>
               <td>
                 <p style="font-weight: bold">Email - </p>
               </td>
               <td></td>
-              <td style="text-align: right;">asdf@gmail.com</td>
+              <td style="text-align: right;"><?php echo $email ?></td>
             </tr>
             <tr>
               <td>
                 <p style="font-weight: bold">Service Type - </p>
               </td>
               <td></td>
-              <td style="text-align: right;">Basic</td>
+              <td style="text-align: right;"><?php echo $service ?></td>
             </tr>
             <tr>
               <td>
                 <p style="font-weight: bold">Date - </p>
               </td>
               <td></td>
-              <td style="text-align: right;">10.10.2022</td>
+              <td style="text-align: right;"><?php echo $date ?></td>
             </tr>
             <tr>
               <td>
                 <p style="font-weight: bold">Time - </p>
               </td>
               <td></td>
-              <td style="text-align: right;">1:00 pm</td>
+              <td style="text-align: right;"><?php echo $time ?></td>
             </tr>
             <tr>
               <td>
@@ -163,31 +183,34 @@ if (isset($_SESSION['UserID'])) {
                 <p style="font-weight: bold;">Sub Total - </p>
               </td>
               <td></td>
-              <td style="text-align: right;">5000 MMK</td>
+              <td style="text-align: right;"><?php echo $cost . " MMK" ?></td>
             </tr>
             <tr>
               <td>
                 <p style="font-weight: bold">Discount - </p>
               </td>
               <td></td>
-              <td style="text-align: right;">0%</td>
+              <td style="text-align: right;"><?php echo $discount . " %" ?></td>
             </tr>
             <td>
               <p style="font-weight: bold">Total - </p>
             </td>
             <td></td>
-            <td style="text-align: right;">5000 MMK</td>
+            <td style="text-align: right;"><?php echo $total . " MMK" ?></td>
             </tr>
           </table>
           <hr>
-          <div class="back-to-shop">
-            <br>
-            <a>
-              <span style="float: right; background-color: red; color: white; padding: 20px;">
-                Cancel Booking &nbsp;
-              </span>
-            </a>
-          </div>
+          <form action="booking-receipt.php?BookingID=<?php echo $bookingID; ?>" method="POST">
+            <input type="text" name="inputBookingID" value='<?php echo $bookingID; ?>' hidden>
+            <div class="back-to-shop">
+              <br>
+              <button style="float: right; border:none;" type="submit" name="btnCancel">
+                <span style="float: right; background-color: red; color: white; padding: 20px;">
+                  Cancel Booking &nbsp;
+                </span>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

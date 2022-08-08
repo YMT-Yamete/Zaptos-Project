@@ -1,13 +1,82 @@
 <?php
+include 'connect.php';
+include 'auto-id.php';
+include 'email-notification.php';
 session_start();
 if (isset($_SESSION['UserID'])) {
   $redirectFile = 'profile.php';
   $redirectName = 'Profile';
+
+  if (isset($_GET['serviceID'])) {
+    $userID = $_SESSION['UserID'];
+    $serviceID = $_GET['serviceID'];
+    $select = "SELECT * FROM Users WHERE UserID = '$userID'";
+    $query = $connection->query($select);
+    while ($row = $query->fetch_assoc()) {
+      $name = $row['Name'];
+      $email = $row['Email'];
+    }
+    $select = "SELECT * FROM Services WHERE ServiceID = '$serviceID'";
+    $query = $connection->query($select);
+    while ($row = $query->fetch_assoc()) {
+      $service = $row['ServiceName'];
+    }
+  }
 } else {
   $redirectFile = 'login.php';
   $redirectName = 'Login';
   echo "<script>alert('Please login first.');</script>";
   echo "<script>window.location = 'login.php';</script>";
+}
+
+if (isset($_POST['btnSubmit'])) {
+  $bookingID = AutoID('B', 6, 'bookings', 'BookingID');
+  $userID = $_SESSION['UserID'];
+  $date = $_POST['inputDate'];
+  $time = $_POST['inputTime'];
+  $bookingStatus = "Pending";
+
+  $select = "SELECT * FROM Memberships m, MembershipTypes mt 
+            WHERE m.MembershipTypeID = mt.MembershipTypeID
+            AND m.UserID = '$userID'
+            AND m.MembershipStatus = 'Active'";
+  $query = $connection->query($select);
+  if($query->num_rows > 0) {
+    while($row = $query->fetch_assoc()) {
+      $discount = $row['DiscountPercent'];
+    }
+  }
+  else {
+    $discount = 0;
+  }
+  $serviceID = $_POST['inputServiceID'];
+  $select = "SELECT * FROM Services WHERE ServiceID = '$serviceID'";
+  $query = $connection->query($select);
+  while ($row = $query->fetch_assoc()) {
+    $cost = $row['Cost'] - ($row['Cost'] * $discount/100);
+  }
+
+  $insert = "INSERT INTO Bookings
+            VALUES ('$bookingID', '$userID', '$serviceID', '$date', '$time', '$discount', '$cost', '$bookingStatus')";
+  if ($connection->query($insert)) {
+
+    EmailNotification($email, 
+    "Zaptos Booking", 
+    "Dear $name, <br>
+
+    Thank you for your booking. <br>
+    
+    Booking ID - $bookingID, <br>
+    Date - $date, <br>
+    Time - $time, <br>
+    Cost - $cost");
+
+    echo "<script>alert('Booking Successful');</script>";
+    echo "<script>window.location = 'home.php'</script>";
+  }
+  else {
+    echo $connection->error;
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -18,30 +87,16 @@ if (isset($_SESSION['UserID'])) {
   <title>Zaptos</title>
 
   <!-- boostrap 4 -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
   <!-- boostrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
-    integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
-    crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 
   <!-- css -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -104,26 +159,29 @@ if (isset($_SESSION['UserID'])) {
         </div>
       </div>
     </div>
-    <form>
+    <form action="booking-form.php?serviceID=<?php echo $serviceID;?>" method="POST">
+      <div class="mb-3">
+        <input type="text" class="form-control" name="inputServiceID" value='<?php echo $serviceID ?>' hidden>
+      </div>
       <div class="mb-3">
         <label for="name" class="form-label">Name</label>
-        <input type="text" class="form-control" required>
+        <input type="text" class="form-control" value='<?php echo $name ?>' readonly>
       </div>
       <div class="mb-3">
         <label for="email" class="form-label">Email</label>
-        <input type="email" class="form-control" required>
+        <input type="email" class="form-control" value='<?php echo $email ?>' readonly>
       </div>
       <div class="mb-3">
         <label for="service type" class="form-label">Service Type</label>
-        <input type="text" class="form-control" required>
+        <input type="text" class="form-control" value='<?php echo $service ?>' readonly>
       </div>
       <div class="mb-3">
         <label for="date" class="form-label">Date</label>
-        <input type="date" class="form-control" required>
+        <input type="date" class="form-control" name="inputDate" required>
       </div>
       <div class="mb-3">
         <label for="time" class="form-label">Time</label>
-        <select class="form-select" aria-label="Default select example" required>
+        <select class="form-select" aria-label="Default select example" name="inputTime" required>
           <option selected>Select time</option>
           <option value="9:00 am">9:00 am</option>
           <option value="9:30 am">9:30 am</option>
@@ -143,7 +201,7 @@ if (isset($_SESSION['UserID'])) {
           <option value="4:30 pm">4:30 pm</option>
         </select>
       </div>
-      <button type="submit" class="btn btn-primary" style="background-color: #005C67;">Submit</button>
+      <button type="submit" class="btn btn-primary" name="btnSubmit" style="background-color: #005C67;">Submit</button>
     </form>
   </div>
   <!-- Site footer -->

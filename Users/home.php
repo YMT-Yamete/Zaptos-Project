@@ -96,7 +96,7 @@ if (isset($_SESSION['UserID'])) {
     </div><br>
     <div class="row">
       <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-        <a href="booking-form.php" style="text-decoration : none; color: black;">
+        <a href="booking-form.php?serviceID=1" style="text-decoration : none; color: black;">
           <div class="card" style="width: 20rem; margin: auto;">
             <img class="card-img-top" src="../Imgs/Assets/basic-car-wash.jpeg">
             <div class="card-body">
@@ -108,7 +108,7 @@ if (isset($_SESSION['UserID'])) {
         </a>
       </div>
       <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-        <a href="booking-form.php" style="text-decoration : none; color: black;">
+        <a href="booking-form.php?serviceID=2" style="text-decoration : none; color: black;">
           <div class="card" style="width: 20rem; margin: auto;">
             <img class="card-img-top" src="../Imgs/Assets/advance-car-wash.jpg">
             <div class="card-body">
@@ -124,7 +124,7 @@ if (isset($_SESSION['UserID'])) {
         </a>
       </div>
       <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-        <a href="booking-form.php" style="text-decoration : none; color: black;">
+        <a href="booking-form.php?serviceID=3" style="text-decoration : none; color: black;">
           <div class="card" style="width: 20rem; margin: auto;">
             <img class="card-img-top" src="../Imgs/Assets/extended-car-wash.jpg">
             <div class="card-body">
@@ -136,7 +136,7 @@ if (isset($_SESSION['UserID'])) {
         </a>
       </div>
       <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-        <a href="booking-form.php" style="text-decoration : none; color: black;">
+        <a href="booking-form.php?serviceID=4" style="text-decoration : none; color: black;">
           <div class="card" style="width: 20rem; margin: auto;">
             <img class="card-img-top" src="../Imgs/Assets/premium-car-wash.jfif">
             <div class="card-body">

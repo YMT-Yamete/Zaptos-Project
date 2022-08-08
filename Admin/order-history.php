@@ -83,7 +83,7 @@ if (isset($_SESSION['AdminID'])) {
                         <li>
                             <a href="shipped-orders.php">Shipped Orders</a>
                         </li>
-                        <li>
+                        <li class="active">
                             <a href="order-history.php">Order History</a>
                         </li>
                     </ul>

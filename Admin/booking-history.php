@@ -2,8 +2,25 @@
 include 'connect.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
+    $select = "SELECT b.BookingID, u.UserID, u.Name, s.ServiceName, b.Date, b.Time, b.Discount ,b.Cost 
+            FROM Bookings b, Users u, Services s
+            WHERE b.UserID = u.UserID
+            AND b.ServiceID = s.ServiceID
+            AND b.BookingStatus = 'Finished'";
+    $query = $connection->query($select);
 } else {
-  echo "<script>window.location = 'login.php'</script>";
+    echo "<script>window.location = 'login.php'</script>";
+}
+
+if (isset($_POST['btnDelete'])) {
+    $bookingID = $_POST['inputBookingID'];
+    $delete = "DELETE FROM Bookings WHERE BookingID = '$bookingID'";
+    if ($connection->query($delete)) {
+        echo "<script>alert('Booking Deleted');</script>";
+        echo "<script>window.location = 'booking-history.php';</script>";
+    } else {
+        echo $connection->error;
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -97,79 +114,45 @@ if (isset($_SESSION['AdminID'])) {
 
         <div id="content" class="p-4 p-md-5 pt-5">
             <div class="container">
-                <h2 class="pageHeader">Bookings</h2>
-                <table id="tableID" class="table table-bordered table-striped table-responsive-stack">
-                    <thead class="tableHeaders">
-                        <tr>
-                            <th>BookingID</th>
-                            <th>UserID</th>
-                            <th>Name</th>
-                            <th>Service</th>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Discount</th>
-                            <th>Cost</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>B-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Basic</td>
-                            <td>12.12.2022</td>
-                            <td>12:30 am</td>
-                            <td>0%</td>
-                            <td>1000 MMK</td>
-                            <td><a href="" style="color: red;">Delete</a></td>
-                        </tr>
-                        <tr>
-                            <td>B-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Basic</td>
-                            <td>12.12.2022</td>
-                            <td>12:30 am</td>
-                            <td>0%</td>
-                            <td>1000 MMK</td>
-                            <td><a href="" style="color: red;">Delete</a></td>
-                        </tr>
-                        <tr>
-                            <td>B-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Basic</td>
-                            <td>12.12.2022</td>
-                            <td>12:30 am</td>
-                            <td>0%</td>
-                            <td>1000 MMK</td>
-                            <td><a href="" style="color: red;">Delete</a></td>
-                        </tr>
-                        <tr>
-                            <td>B-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Basic</td>
-                            <td>12.12.2022</td>
-                            <td>12:30 am</td>
-                            <td>0%</td>
-                            <td>1000 MMK</td>
-                            <td><a href="" style="color: red;">Delete</a></td>
-                        </tr>
-                        <tr>
-                            <td>B-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Basic</td>
-                            <td>12.12.2022</td>
-                            <td>12:30 am</td>
-                            <td>0%</td>
-                            <td>1000 MMK</td>
-                            <td><a href="" style="color: red;">Delete</a></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <h2 class="pageHeader">Booking History</h2>
+                <form action="booking-history.php" method="POST">
+                    <table id="tableID" class="table table-bordered table-striped table-responsive-stack">
+                        <thead class="tableHeaders">
+                            <tr>
+                                <th>BookingID</th>
+                                <th>UserID</th>
+                                <th>Name</th>
+                                <th>Service</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Discount</th>
+                                <th>Cost</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            while ($row = $query->fetch_assoc()) {
+                                echo
+                                '<tr>
+                                    <td>' . $row["BookingID"] . '</td>
+                                    <td>' . $row["UserID"] . '</td>
+                                    <td>' . $row["Name"] . '</td>
+                                    <td>' . $row["ServiceName"] . '</td>
+                                    <td>' . $row["Date"] . '</td>
+                                    <td>' . $row["Time"] . '</td>
+                                    <td>' . $row["Discount"] . '% </td>
+                                    <td>' . $row["Cost"] . '</td>
+                                    <td>
+                                        <input type="text" name="inputBookingID" value=' . $row["BookingID"] . ' hidden>
+                                        <input type="submit" class="actionButton" name="btnDelete" style="background-color: transparent; color:red;" value="Delete">
+                                    </td>
+                                </tr>';
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </form>
             </div>
         </div>
     </div>
