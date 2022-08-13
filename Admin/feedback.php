@@ -2,6 +2,7 @@
 include 'connect.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
+    // fetch feedback
     $select  = "SELECT * FROM Feedbacks f, Users u
                 WHERE f.UserID = u.UserID";
     $query = $connection->query($select);

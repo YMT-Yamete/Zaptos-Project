@@ -2,6 +2,7 @@
 include 'connect.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
+  // fetch bookings
   $select = "SELECT b.BookingID, u.UserID, u.Name, s.ServiceName, b.Date, b.Time, b.Discount ,b.Cost 
             FROM Bookings b, Users u, Services s
             WHERE b.UserID = u.UserID
@@ -12,6 +13,7 @@ if (isset($_SESSION['AdminID'])) {
   echo "<script>window.location = 'login.php'</script>";
 }
 
+// set booking as finished
 if (isset($_POST['btnFinished'])) {
   $bookingID = $_POST['inputBookingID'];
   $update = "UPDATE Bookings 

@@ -1,6 +1,8 @@
 <?php
 include 'connect.php';
 session_start();
+
+//login timer
 if (isset($_SESSION['blockTime'])) {
   $difference = time() - $_SESSION['blockTime'];
   if ($difference > 30) {
@@ -8,6 +10,8 @@ if (isset($_SESSION['blockTime'])) {
     unset($_SESSION['loginAttempt']);
   }
 }
+
+//login form submit
 if (isset($_POST['btnSubmit'])) {
   $email = $_POST['inputEmail'];
   $password = sha1($_POST['inputPassword']);

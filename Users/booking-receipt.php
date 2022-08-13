@@ -8,6 +8,8 @@ if (isset($_SESSION['UserID'])) {
   if (isset($_GET['BookingID'])) {
     $userID = $_SESSION['UserID'];
     $bookingID = $_GET['BookingID'];
+
+    //fetch data and calculate cost
     $select = "SELECT * FROM Bookings b, Users u 
               WHERE b.UserID = u.UserID
               AND b.BookingID = '$bookingID'";
@@ -35,6 +37,7 @@ if (isset($_SESSION['UserID'])) {
   echo "<script>window.location = 'login.php';</script>";
 }
 
+// cancel booking
 if (isset($_POST['btnCancel'])) {
   $bookingID = $_POST['inputBookingID'];
   $delete = "DELETE FROM Bookings WHERE BookingID = '$bookingID'";

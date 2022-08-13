@@ -1,7 +1,7 @@
 <?php
 include 'connect.php';
 session_start();
-// display data
+// display profile data
 if (isset($_SESSION['UserID'])) {
   $redirectFile = 'profile.php';
   $redirectName = 'Profile';

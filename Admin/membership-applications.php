@@ -2,6 +2,7 @@
 include 'connect.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
+    // fetch membership form applicatoin
     $select = "SELECT * FROM Memberships m, Users u, MembershipTypes mt
                 WHERE m.UserID = u.UserID
                 AND m.MembershipTypeID = mt.MembershipTypeID
@@ -11,6 +12,7 @@ if (isset($_SESSION['AdminID'])) {
     echo "<script>window.location = 'login.php'</script>";
 }
 
+// accept membership
 if (isset($_POST['btnAccept'])) {
     $membershipID = $_POST['inputMembershipID'];
     $startDate = date("Y-m-d");

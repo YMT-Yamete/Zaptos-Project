@@ -4,6 +4,8 @@ session_start();
 if (isset($_SESSION['AdminID'])) {
     echo "<script>window.location = 'index.php'</script>";
 }
+
+// login form submit
 if (isset($_POST['btnSubmit'])) {
     $username = $_POST['inputUsername'];
     $password = $_POST['inputPassword'];

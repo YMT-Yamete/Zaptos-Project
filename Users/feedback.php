@@ -22,7 +22,7 @@ if (isset($_SESSION['UserID'])) {
   echo "<script>window.location = 'login.php';</script>";
 }
 
-// form submit
+// feedback form submit
 if (isset($_POST['btnSubmit'])) {
   $userID = $_SESSION['UserID'];
   $feedbackID = AutoID('F', 6, 'Feedbacks', 'FeedbackID');

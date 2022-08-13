@@ -2,6 +2,7 @@
 include 'connect.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
+    // fetch data
     $select = "SELECT b.BookingID, u.UserID, u.Name, s.ServiceName, b.Date, b.Time, b.Discount ,b.Cost 
             FROM Bookings b, Users u, Services s
             WHERE b.UserID = u.UserID
@@ -12,6 +13,7 @@ if (isset($_SESSION['AdminID'])) {
     echo "<script>window.location = 'login.php'</script>";
 }
 
+// delete booking
 if (isset($_POST['btnDelete'])) {
     $bookingID = $_POST['inputBookingID'];
     $delete = "DELETE FROM Bookings WHERE BookingID = '$bookingID'";

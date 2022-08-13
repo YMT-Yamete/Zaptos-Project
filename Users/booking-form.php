@@ -3,10 +3,14 @@ include 'connect.php';
 include 'auto-id.php';
 include 'email-notification.php';
 session_start();
+
+define("NUM_OF_WORKSPACES", 5);
+
 if (isset($_SESSION['UserID'])) {
   $redirectFile = 'profile.php';
   $redirectName = 'Profile';
 
+  //fetch data
   if (isset($_GET['serviceID'])) {
     $userID = $_SESSION['UserID'];
     $serviceID = $_GET['serviceID'];
@@ -36,46 +40,60 @@ if (isset($_POST['btnSubmit'])) {
   $time = $_POST['inputTime'];
   $bookingStatus = "Pending";
 
-  $select = "SELECT * FROM Memberships m, MembershipTypes mt 
+  //to check booking concflicts (booking count not allowed more than number of workspacec)
+  $select = "SELECT * FROM Bookings WHERE Date='$date' AND Time= '$time'";
+  if ($connection->query($select)->num_rows >= NUM_OF_WORKSPACES) {
+    echo "<script>alert('Booking is full on the selected date and time');</script>";
+    echo "<script>window.location = 'booking-form.php?serviceID=$serviceID'</script>";
+  } else {
+    //discount percent fetch
+    $select = "SELECT * FROM Memberships m, MembershipTypes mt 
             WHERE m.MembershipTypeID = mt.MembershipTypeID
             AND m.UserID = '$userID'
             AND m.MembershipStatus = 'Active'";
-  $query = $connection->query($select);
-  if($query->num_rows > 0) {
-    while($row = $query->fetch_assoc()) {
-      $discount = $row['DiscountPercent'];
+    $query = $connection->query($select);
+    if ($query->num_rows > 0) {
+      while ($row = $query->fetch_assoc()) {
+        $discount = $row['DiscountPercent'];
+      }
+    } else {
+      $discount = 0;
     }
-  }
-  else {
-    $discount = 0;
-  }
-  $serviceID = $_POST['inputServiceID'];
-  $select = "SELECT * FROM Services WHERE ServiceID = '$serviceID'";
-  $query = $connection->query($select);
-  while ($row = $query->fetch_assoc()) {
-    $cost = $row['Cost'] - ($row['Cost'] * $discount/100);
-  }
 
-  $insert = "INSERT INTO Bookings
-            VALUES ('$bookingID', '$userID', '$serviceID', '$date', '$time', '$discount', '$cost', '$bookingStatus')";
-  if ($connection->query($insert)) {
+    //calculate total cost after discount
+    $serviceID = $_POST['inputServiceID'];
+    $select = "SELECT * FROM Services WHERE ServiceID = '$serviceID'";
+    $query = $connection->query($select);
+    while ($row = $query->fetch_assoc()) {
+      $cost = $row['Cost'] - ($row['Cost'] * $discount / 100);
+    }
 
-    EmailNotification($email, 
-    "Zaptos Booking", 
-    "Dear $name, <br>
+    //does not allow booking if time is not selected
+    if ($time == "Select time") {
+      echo "<script>alert('Please select a time.');</script>";
+    } else {
+      $insert = "INSERT INTO Bookings
+    VALUES ('$bookingID', '$userID', '$serviceID', '$date', '$time', '$discount', '$cost', '$bookingStatus')";
+      if ($connection->query($insert)) {
 
-    Thank you for your booking. <br>
-    
-    Booking ID - $bookingID, <br>
-    Date - $date, <br>
-    Time - $time, <br>
-    Cost - $cost");
+        EmailNotification(
+          $email,
+          "Zaptos Booking",
+          "Dear $name, <br>
 
-    echo "<script>alert('Booking Successful');</script>";
-    echo "<script>window.location = 'home.php'</script>";
-  }
-  else {
-    echo $connection->error;
+            Thank you for your booking. <br>
+
+            Booking ID - $bookingID, <br>
+            Date - $date, <br>
+            Time - $time, <br>
+            Cost - $cost"
+        );
+        echo "<script>alert('Booking Successful');</script>";
+        echo "<script>window.location = 'home.php'</script>";
+      } else {
+        echo $connection->error;
+      }
+    }
   }
 }
 ?>
@@ -159,7 +177,7 @@ if (isset($_POST['btnSubmit'])) {
         </div>
       </div>
     </div>
-    <form action="booking-form.php?serviceID=<?php echo $serviceID;?>" method="POST">
+    <form action="booking-form.php?serviceID=<?php echo $serviceID; ?>" method="POST">
       <div class="mb-3">
         <input type="text" class="form-control" name="inputServiceID" value='<?php echo $serviceID ?>' hidden>
       </div>

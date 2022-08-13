@@ -3,6 +3,7 @@ include 'connect.php';
 include 'email-notification.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
+    // fetch feedback data
     if (isset($_GET['FeedbackID'])) {
         $fid = $_GET['FeedbackID'];
         $select  = "SELECT * FROM Feedbacks f, Users u
@@ -14,6 +15,7 @@ if (isset($_SESSION['AdminID'])) {
     echo "<script>window.location = 'login.php'</script>";
 }
 
+// reply feedback
 if (isset($_POST['btnSubmit'])) {
     $email = $_POST['inputEmail'];
     $subject = $_POST['inputSubject'];

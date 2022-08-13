@@ -2,6 +2,7 @@
 include 'connect.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
+    // select members
     $select = "SELECT * FROM Memberships m, Users u, MembershipTypes mt
                 WHERE m.UserID = u.UserID
                 AND m.MembershipTypeID = mt.MembershipTypeID
@@ -11,6 +12,7 @@ if (isset($_SESSION['AdminID'])) {
     echo "<script>window.location = 'login.php'</script>";
 }
 
+// remove members
 if (isset($_POST['btnRemove'])) {
     $membershipID = $_POST['inputMembershipID'];
     $delete = "DELETE FROM Memberships WHERE MembershipID = '$membershipID'";

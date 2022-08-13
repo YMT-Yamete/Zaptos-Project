@@ -31,7 +31,7 @@ if (isset($_SESSION['UserID'])) {
   echo "<script>window.location = 'login.php';</script>";
 }
 
-// form submit
+// membership form submit
 if (isset($_POST['btnSubmit'])) {
   $membershipID = AutoID('M', 6, 'Memberships', 'MembershipID');
   $userID = $_SESSION['UserID'];

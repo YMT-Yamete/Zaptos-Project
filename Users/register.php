@@ -2,6 +2,8 @@
 include 'connect.php';
 include 'auto-id.php';
 session_start();
+
+//register form submit
 if (isset($_POST['btnSubmit'])) {
   $id = AutoID('U', 6, 'Users', 'UserID');
   $name = $_POST['inputName'];
@@ -10,23 +12,26 @@ if (isset($_POST['btnSubmit'])) {
   $password = sha1($_POST['inputPassword']);
   $repeatPassword = sha1($_POST['inputRepeatPassword']);
 
+
+  // check if email is already in used or not
   $select = "SELECT * FROM Users WHERE Email = '$email'";
   if ($connection->query($select)->num_rows > 0) {
     echo "<script>alert('This email is already in use.');</script>";
     echo "<script>window.location = 'register.php'</script>";
-  }
-
-  if ($password == $repeatPassword) {
-    $insert = "INSERT INTO Users VALUES ('$id', '$name', '$email', '$password', '$phone');";
-    if ($connection->query($insert)) {
-      $_SESSION['UserID'] = $id;
-      echo "<script>alert('Account Created Successfully');</script>";
-      echo "<script>window.location = 'home.php'</script>";
-    } else {
-      echo $connection->error;
-    }
   } else {
-    echo "<script>alert('Password and Repeat Password do not match.');</script>";
+    // check if two password matches
+    if ($password == $repeatPassword) {
+      $insert = "INSERT INTO Users VALUES ('$id', '$name', '$email', '$password', '$phone');";
+      if ($connection->query($insert)) {
+        $_SESSION['UserID'] = $id;
+        echo "<script>alert('Account Created Successfully');</script>";
+        echo "<script>window.location = 'home.php'</script>";
+      } else {
+        echo $connection->error;
+      }
+    } else {
+      echo "<script>alert('Password and Repeat Password do not match.');</script>";
+    }
   }
 }
 ?>

@@ -2,6 +2,7 @@
 include 'connect.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
+  // fetch users
   $select = "SELECT * FROM Users u LEFT JOIN Memberships USING (UserID)";
   $query = $connection->query($select);
 } else {

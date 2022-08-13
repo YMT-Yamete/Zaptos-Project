@@ -16,6 +16,7 @@ if (isset($_POST['btnSubmit'])) {
   $newPassword = sha1($_POST['inputNewPw']);
   $oldPassword = sha1($_POST['inputOldPw']);
   
+  // fetch old password
   $select = "SELECT * FROM Users
             WHERE UserID = '$id'";
   $query = $connection->query($select);
@@ -25,6 +26,7 @@ if (isset($_POST['btnSubmit'])) {
     }
   }
 
+  // check if the old password matches and update new password
   if ($oldPassword == $pwInDB) {
     $update = "UPDATE Users
               SET Password = '$newPassword'

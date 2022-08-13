@@ -4,7 +4,8 @@ session_start();
 if (isset($_SESSION['UserID'])) {
   $redirectFile = 'profile.php';
   $redirectName = 'Profile';
-
+  
+  //fetch booking history
   $userID = $_SESSION['UserID'];
   $select = "SELECT * FROM Bookings WHERE UserID = '$userID'";
   $query = $connection->query($select);
