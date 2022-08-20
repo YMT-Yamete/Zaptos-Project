@@ -97,7 +97,7 @@ if (isset($_SESSION['AdminID'])) {
 
         <div id="content" class="p-4 p-md-5 pt-5">
             <div class="container">
-                <h2 class="pageHeader">Orders</h2>
+                <h2 class="pageHeader">Shipped Orders</h2>
                 <table id="tableID" class="table table-bordered table-striped table-responsive-stack">
                     <thead class="tableHeaders">
                         <tr>

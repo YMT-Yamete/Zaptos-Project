@@ -114,7 +114,7 @@ if (isset($_SESSION['UserID'])) {
         <input type="email" class="form-control" required>
       </div>
       <div class="mb-3">
-        <label for="address" class="form-label">Address</label>
+        <label for="address" class="form-label">Shipping Address</label>
         <div class="form-group">
           <textarea class="form-control" rows="3"></textarea>
         </div>
