@@ -1,9 +1,32 @@
 <?php
+include 'auto-id.php';
 include 'connect.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
 } else {
-  echo "<script>window.location = 'login.php'</script>";
+    echo "<script>window.location = 'login.php'</script>";
+}
+
+//product add form submit
+if (isset($_POST['btnSubmit'])) {
+    $id = AutoID('P', 6, "Products", "ProductID");
+    $name = $_POST['inputName'];
+    $description = $_POST['inputDescription'];
+    $price = $_POST['inputPrice'];
+    $stock = $_POST['inputStock'];
+
+    $savedDestination = '../Imgs/Product/' . $id . '.jpg';
+    $copiedImg = copy($_FILES['inputImg']['tmp_name'], $savedDestination);
+
+    if ($copiedImg) {
+        $insertQuery = "INSERT INTO Products VALUES ('$id', '$name', '$description', '$price', '$stock', '$savedDestination')";
+        if ($connection->query($insertQuery)) {
+            echo "<script>alert('New Product Added')</script>";
+            echo "<script>window.location = 'stocks.php'</script>";
+        } else {
+            echo $connection->error;
+        }
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -90,7 +113,7 @@ if (isset($_SESSION['AdminID'])) {
                 </li>
                 <li style="text-align:center;">
                     <br>
-                    <a href="logout.php"><button type="submit" class="btn" name="btnSubmit" style="background-color: #005C67; color: white;">Logout</button></a>
+                    <a href="logout.php"><button type="submit" class="btn" style="background-color: #005C67; color: white;">Logout</button></a>
                 </li>
             </ul>
         </nav>
@@ -98,27 +121,29 @@ if (isset($_SESSION['AdminID'])) {
         <div id="content" class="p-4 p-md-5 pt-5">
             <div class="container">
                 <h2 class="pageHeader">Add New Product</h2>
-                <div class="mb-3">
-                    <label for="name" class="form-label">Product Name</label>
-                    <input type="text" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Product Description</label><br>
-                    <textarea name="" id="" style="width: 100%; border-color: #ced4da;" rows="5"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="price" class="form-label">Price</label>
-                    <input type="text" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label for="stock" class="form-label">In stock</label>
-                    <input type="number" class="form-control" min="0">
-                </div>
-                <div class="mb-3">
-                    <label for="formFile" class="form-label">Product Image</label>
-                    <input class="form-control" type="file" id="formFile">
-                </div>
-                <button type="button" class="btn" style="background-color: #005C67; color: white;">Add Product</button>
+                <form action="add-product.php" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Product Name</label>
+                        <input type="text" name="inputName" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Product Description</label><br>
+                        <textarea name="inputDescription" style="width: 100%; border-color: #ced4da;" rows="5"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Price</label>
+                        <input type="text" name="inputPrice" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="stock" class="form-label">In stock</label>
+                        <input type="number" name="inputStock" class="form-control" min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Product Image</label>
+                        <input class="form-control" name="inputImg" type="file" id="formFile">
+                    </div>
+                    <button type="submit" name="btnSubmit" class="btn" style="background-color: #005C67; color: white;">Add Product</button>
+                </form>
             </div>
         </div>
     </div>

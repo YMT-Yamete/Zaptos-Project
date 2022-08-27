@@ -1,13 +1,51 @@
 <?php
+include 'connect.php';
 session_start();
 if (isset($_SESSION['UserID'])) {
   $redirectFile = 'profile.php';
   $redirectName = 'Profile';
+  $userID = $_SESSION['UserID'];
+
+  // get order information
+  if (isset($_GET['OrderID']))
+    $orderID = $_GET['OrderID'];
+  $select = "SELECT * FROM Orders o, Users u, Products p, OrderProduct op
+                WHERE o.OrderID = op.OrderID
+                AND p.ProductID = op.ProductID
+                AND o.UserID = u.UserID
+                AND o.OrderID = '$orderID'";
+  $query = $connection->query($select);
+
+  // get delivery fee
+  $selectDeli = "SELECT * FROM Memberships m, MembershipTypes mt 
+    WHERE m.MembershipTypeID = mt.MembershipTypeID
+    AND m.UserID = '$userID'
+    AND m.MembershipStatus = 'Active'";
+  $queryDeli = $connection->query($selectDeli);
+  if ($queryDeli->num_rows > 0) {
+    while ($row = $queryDeli->fetch_assoc()) {
+      $freeDeliStatus = $row['FreeDeliveryStatus'];
+    }
+  }
+  $deliFee = $freeDeliStatus == "Free" ? 0 : 2000;
 } else {
   $redirectFile = 'login.php';
   $redirectName = 'Login';
   echo "<script>alert('Please login first.');</script>";
   echo "<script>window.location = 'login.php';</script>";
+}
+
+
+// cancel order
+if (isset($_POST['btnCancel'])) {
+  $delete1 = "DELETE FROM OrderProduct WHERE OrderID = '$orderID'";
+  $delete2 = "DELETE FROM Orders WHERE OrderID = '$orderID'";
+  if ($connection->query($delete1) && $connection->query($delete2)) {
+    echo "<script>alert('Order Cancelled');</script>";
+    echo "<script>window.location = 'shopping-history.php';</script>";
+  } else {
+    echo $connection->error;
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -71,7 +109,7 @@ if (isset($_SESSION['UserID'])) {
         </a>
         <a href="shopping-cart.php" class="notification">
           <i class="fa fa-shopping-cart fa-lg" style="color: white;"></i>
-          <span class="badge">3</span>
+          <span class="badge"><?php echo isset($_SESSION['ItemsInCart']) ? $_SESSION['ItemsInCart'] : ""; ?></span>
         </a>
         <a href="booking-history.php">
           <i class="fa fa-file-text-o fa-lg" style="color: white;"></i>
@@ -95,120 +133,89 @@ if (isset($_SESSION['UserID'])) {
     <div class="card">
       <div class="row">
         <div class="col-md-12 cart p-5">
-          <p>S-000001</p>
-          <div class="row border-top border-bottom">
-            <div class="row main align-items-center">
-              <div class="col-2 p-3">
-                <img class="img-fluid" src="../Imgs/Assets/air-outlet-decoration.jpg" width="300px" height="500px">
-              </div>
-              <div class="col">
-                <div class="row text-muted">Air-Outlet</div>
-                <div class="row">3000 MMK</div>
-              </div>
-              <div class="col">3</div>
-              <div class="col">3000 MMK</div>
-              <div class="col">
-                <a href="rate-product.php"><button type="button" class="btn btn-link">Rate this product</button></a>
-              </div>
+          <p><?php echo $orderID ?></p>
+          <?php
+          while ($row = $query->fetch_assoc()) {
+            $discount = $row['Discount'];
+            $total = $row['Cost'];
+            $multiploedPrice = $row['Price'] * $row['Quantity'];
+            $orderStatus = $row['OrderStatus'];
+            $ratingHiddenStatus = ($orderStatus == 'Delivered') ? '' : 'hidden';
+            echo
+            "<div class='row border-top border-bottom'>
+                <div class='row main align-items-center'>
+                  <div class='col-2 p-3'>
+                    <img class='img-fluid' src='$row[ProductImage]' width='300px' height='500px'>
+                  </div>
+                  <div class='col'>
+                    <div class='row text-muted'>$row[ProductName]</div>
+                    <div class='row'>$row[Price] MMK</div>
+                  </div>
+                  <div class='col'>$row[Quantity]</div>
+                  <div class='col'>$multiploedPrice MMK</div>
+                  <div class='col' $ratingHiddenStatus>
+                    <a href='rate-product.php?ProductID=$row[ProductID]&OrderID=$row[OrderID]'><button type='button' class='btn btn-link'>Rate this product</button></a>
+                  </div>
+                </div>
+              </div>";
+          }
+          ?>
+          <div class='row main align-items-center'>
+            <div class='col-2 p-3'>
             </div>
+            <div class='col'>
+            </div>
+            <div class='col'>
+              <a>&nbsp;</a><br>
+              <a><span class='text-muted'>Delivery</span></a><br>
+              <a>&nbsp;</a><br>
+            </div>
+            <div class='col'><?php echo $deliFee ?> MMK</div>
           </div>
-          <div class="row">
-            <div class="row main align-items-center">
-              <div class="col-2 p-3">
-                <img class="img-fluid" src="../Imgs/Assets/air-outlet-decoration.jpg" width="300px" height="500px">
-              </div>
-              <div class="col">
-                <div class="row text-muted">Air-Outlet</div>
-                <div class="row">3000 MMK</div>
-              </div>
-              <div class="col">3</div>
-              <div class="col">3000 MMK</div>
-              <div class="col">
-                <a href="rate-product.php"><button type="button" class="btn btn-link">Rate this product</button></a>
-              </div>
+          <div class='row main align-items-center'>
+            <div class='col-2 p-3'>
             </div>
+            <div class='col'>
+            </div>
+            <div class='col'>
+              <a>&nbsp;</a><br>
+              <a><span class='text-muted'>Discount</span></a><br>
+              <a>&nbsp;</a><br>
+            </div>
+            <div class='col'><?php echo $discount ?>%</div>
           </div>
-          <div class="row border-top border-bottom">
-            <div class="row main align-items-center">
-              <div class="col-2 p-3">
-                <img class="img-fluid" src="../Imgs/Assets/car-cover.jpg" width="300px" height="500px">
-              </div>
-              <div class="col">
-                <div class="row text-muted">Car-Cover</div>
-                <div class="row">4000 MMK</div>
-              </div>
-              <div class="col">3</div>
-              <div class="col">4000 MMK</div>
-              <div class="col">
-                <a href="rate-product.php"><button type="button" class="btn btn-link">Rate this product</button></a>
-              </div>
+          <div class='row main align-items-center'>
+            <div class='col-2 p-3'>
             </div>
+            <div class='col'>
+            </div>
+            <div class='col'>
+              <a>&nbsp;</a><br>
+              <a><span class='text-muted'>Total Cost</span></a><br>
+              <a>&nbsp;</a><br>
+              <a>&nbsp;</a><br>
+            </div>
+            <div class='col' style='background-color: #00cfe7; padding: 10px;'><?php echo $total ?></div>
           </div>
-          <div class="row border-top border-bottom">
-            <div class="row main align-items-center">
-              <div class="col-2 p-3">
-              </div>
-              <div class="col">
-              </div>
-              <div class="col">
-                <a>&nbsp;</a><br>
-                <a>&nbsp;</a><br>
-                <a><span class="text-muted">Sub Total</span></a><br>
-                <a>&nbsp;</a><br>
-              </div>
-              <div class="col">10000 MMK</div>
-            </div>
-            <div class="row main align-items-center">
-              <div class="col-2 p-3">
-              </div>
-              <div class="col">
-              </div>
-              <div class="col">
-                <a>&nbsp;</a><br>
-                <a><span class="text-muted">Delivery</span></a><br>
-                <a>&nbsp;</a><br>
-              </div>
-              <div class="col">2000 MMK</div>
-            </div>
-            <div class="row main align-items-center">
-              <div class="col-2 p-3">
-              </div>
-              <div class="col">
-              </div>
-              <div class="col">
-                <a>&nbsp;</a><br>
-                <a><span class="text-muted">Discount</span></a><br>
-                <a>&nbsp;</a><br>
-              </div>
-              <div class="col">0%</div>
-            </div>
-            <div class="row main align-items-center">
-              <div class="col-2 p-3">
-              </div>
-              <div class="col">
-              </div>
-              <div class="col">
-                <a>&nbsp;</a><br>
-                <a><span class="text-muted">Total</span></a><br>
-                <a>&nbsp;</a><br>
-                <a>&nbsp;</a><br>
-              </div>
-              <div class="col" style="background-color: #00cfe7; padding: 10px;">12000 MMK</div>
-            </div>
-          </div>
+        </div>
+        <?php $cancelHiddenStatus = ($orderStatus == 'Order Placed') ? '' : 'hidden' ?>
+        <form action="shopping-receipt.php?OrderID=<?php echo $orderID ?>" method="POST">
           <div class="back-to-shop">
             <br>
             <a>
-              <span style="float: right; background-color: red; color: white; padding: 20px;">
-                Cancel Order &nbsp;
+              <span style="float: right; background-color: red; color: white; padding: 20px; margin: 20px;" <?php echo $cancelHiddenStatus ?>>
+                <button style="background-color: transparent;color:white;border:none;" type="submit" name="btnCancel">
+                  Cancel Order &nbsp;
+                </button>
               </span>
-              <p>You cannot cancel the order once the order is shipped.</p>
+              <p style="margin: 50px; color: red;">You cannot cancel the order once the order is shipped.</p>
             </a>
           </div>
-          <br>
-        </div>
+        </form>
+        <br>
       </div>
     </div>
+  </div>
   </div>
 
   <!-- Site footer -->

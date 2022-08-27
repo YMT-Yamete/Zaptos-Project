@@ -193,6 +193,7 @@
             (OrderID varchar(30) NOT NULL,
             ProductID varchar(30) NOT NULL,
             Quantity int,
+            Rating int,
             PRIMARY KEY (OrderID, ProductID),
             FOREIGN KEY (OrderID) REFERENCES Orders (OrderID),
             FOREIGN KEY (ProductID) REFERENCES Products (ProductID));";

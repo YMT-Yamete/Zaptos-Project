@@ -50,13 +50,15 @@ if (isset($_POST['btnSubmit'])) {
     echo "<script>alert('You cannot submit application form right now.')</script>";
     echo "<script>window.location = 'home.php';</script>";
   } else {
-    $insert = "INSERT INTO Memberships (MembershipID, UserID, MembershipTypeID, Payment, MembershipStatus)
-    VALUES ('$membershipID', '$userID', '$membershipTypeID', '$savedDestination', '$membershipStatus')";
-    if ($connection->query($insert)) {
-      echo "<script>alert('Application Form Submitted. We will reach you out soon.')</script>";
-      echo "<script>window.location = 'home.php';</script>";
-    } else {
-      echo $connection->error;
+    if ($copiedImg) {
+      $insert = "INSERT INTO Memberships (MembershipID, UserID, MembershipTypeID, Payment, MembershipStatus)
+      VALUES ('$membershipID', '$userID', '$membershipTypeID', '$savedDestination', '$membershipStatus')";
+      if ($connection->query($insert)) {
+        echo "<script>alert('Application Form Submitted. We will reach you out soon.')</script>";
+        echo "<script>window.location = 'home.php';</script>";
+      } else {
+        echo $connection->error;
+      }
     }
   }
 }
@@ -121,7 +123,7 @@ if (isset($_POST['btnSubmit'])) {
         </a>
         <a href="shopping-cart.php" class="notification">
           <i class="fa fa-shopping-cart fa-lg" style="color: white;"></i>
-          <span class="badge">3</span>
+          <span class="badge"><?php echo isset($_SESSION['ItemsInCart'])?$_SESSION['ItemsInCart']:"";?></span>
         </a>
         <a href="booking-history.php">
           <i class="fa fa-file-text-o fa-lg" style="color: white;"></i>

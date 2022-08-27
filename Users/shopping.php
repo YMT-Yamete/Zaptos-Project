@@ -1,11 +1,18 @@
 <?php
+include 'connect.php';
 session_start();
 if (isset($_SESSION['UserID'])) {
   $redirectFile = 'profile.php';
   $redirectName = 'Profile';
+
+  //select all the products in the database to display
+  $productSelect = "SELECT * FROM Products WHERE Stock > 0";
+  $query = $connection->query($productSelect);
 } else {
   $redirectFile = 'login.php';
   $redirectName = 'Login';
+  echo "<script>alert('Please login first.');</script>";
+  echo "<script>window.location = 'login.php';</script>";
 }
 ?>
 <!DOCTYPE html>
@@ -80,7 +87,7 @@ if (isset($_SESSION['UserID'])) {
         </a>
         <a href="shopping-cart.php" class="notification">
           <i class="fa fa-shopping-cart fa-lg" style="color: white;"></i>
-          <span class="badge">3</span>
+          <span class="badge"><?php echo isset($_SESSION['ItemsInCart'])?$_SESSION['ItemsInCart']:"";?></span>
         </a>
         <a href="booking-history.php">
           <i class="fa fa-file-text-o fa-lg" style="color: white;"></i>
@@ -104,116 +111,22 @@ if (isset($_SESSION['UserID'])) {
       </div>
     </div>
     <div class="row">
-      <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-        <a href="product-details.php" style="text-decoration : none; color: black;">
-          <div class="card" style="width: 20rem; margin: auto;">
-            <img class="card-img-top" src="../Imgs/Assets/car-cover.jpg">
-            <div class="card-body">
-              <p class="product-name">Car Cover</p>
-              <p class="product-price">7000 MMK</p>
+    <?php
+      while ($row = $query->fetch_assoc()) {
+        echo 
+        "<div class='col-12 col-md-6 col-lg-4 col-xl-3 p-2'>
+        <a href='product-details.php?ProductID=$row[ProductID]' style='text-decoration : none; color: black;'>
+          <div class='card' style='width: 20rem; margin: auto;'>
+            <img class='card-img-top' src='$row[ProductImage]'>
+            <div class='card-body'>
+              <p class='product-name'>$row[ProductName]</p>
+              <p class='product-price'>$row[Price] MMK</p>
             </div>
           </div>
         </a>
-      </div>
-      <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-        <a href="product-details.php" style="text-decoration : none; color: black;">
-          <div class="card" style="width: 20rem; margin: auto;">
-            <img class="card-img-top" src="../Imgs/Assets/car-cover.jpg">
-            <div class="card-body">
-              <p class="product-name">Car Cover</p>
-              <p class="product-price">7000 MMK</p>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-        <a href="product-details.php" style="text-decoration : none; color: black;">
-          <div class="card" style="width: 20rem; margin: auto;">
-            <img class="card-img-top" src="../Imgs/Assets/car-cover.jpg">
-            <div class="card-body">
-              <p class="product-name">Car Cover</p>
-              <p class="product-price">7000 MMK</p>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-        <a href="product-details.php" style="text-decoration : none; color: black;">
-          <div class="card" style="width: 20rem; margin: auto;">
-            <img class="card-img-top" src="../Imgs/Assets/car-cover.jpg">
-            <div class="card-body">
-              <p class="product-name">Car Cover</p>
-              <p class="product-price">7000 MMK</p>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-        <a href="product-details.php" style="text-decoration : none; color: black;">
-          <div class="card" style="width: 20rem; margin: auto;">
-            <img class="card-img-top" src="../Imgs/Assets/car-cover.jpg">
-            <div class="card-body">
-              <p class="product-name">Car Cover</p>
-              <p class="product-price">7000 MMK</p>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-        <a href="product-details.php" style="text-decoration : none; color: black;">
-          <div class="card" style="width: 20rem; margin: auto;">
-            <img class="card-img-top" src="../Imgs/Assets/car-cover.jpg">
-            <div class="card-body">
-              <p class="product-name">Car Cover</p>
-              <p class="product-price">7000 MMK</p>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-        <a href="product-details.php" style="text-decoration : none; color: black;">
-          <div class="card" style="width: 20rem; margin: auto;">
-            <img class="card-img-top" src="../Imgs/Assets/car-cover.jpg">
-            <div class="card-body">
-              <p class="product-name">Car Cover</p>
-              <p class="product-price">7000 MMK</p>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-        <a href="product-details.php" style="text-decoration : none; color: black;">
-          <div class="card" style="width: 20rem; margin: auto;">
-            <img class="card-img-top" src="../Imgs/Assets/car-cover.jpg">
-            <div class="card-body">
-              <p class="product-name">Car Cover</p>
-              <p class="product-price">7000 MMK</p>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-        <a href="product-details.php" style="text-decoration : none; color: black;">
-          <div class="card" style="width: 20rem; margin: auto;">
-            <img class="card-img-top" src="../Imgs/Assets/car-cover.jpg">
-            <div class="card-body">
-              <p class="product-name">Car Cover</p>
-              <p class="product-price">7000 MMK</p>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-        <a href="product-details.php" style="text-decoration : none; color: black;">
-          <div class="card" style="width: 20rem; margin: auto;">
-            <img class="card-img-top" src="../Imgs/Assets/car-cover.jpg">
-            <div class="card-body">
-              <p class="product-name">Car Cover</p>
-              <p class="product-price">7000 MMK</p>
-            </div>
-          </div>
-        </a>
-      </div>
+      </div>";
+      }
+    ?>
     </div>
   </div>
 

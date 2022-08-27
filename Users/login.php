@@ -23,6 +23,8 @@ if (isset($_POST['btnSubmit'])) {
   if ($count > 0) {
     $usersArray = $query->fetch_array();
     $_SESSION['UserID'] = $usersArray['UserID'];
+    $_SESSION['Cart'] = array();
+    $_SESSION['ItemsInCart'] = 0;
     echo "<script>alert('Login Successful');</script>";
     echo "<script>window.location = 'home.php'</script>";
   } else {
@@ -96,7 +98,7 @@ if (isset($_POST['btnSubmit'])) {
         </a>
         <a href="shopping-cart.php" class="notification">
           <i class="fa fa-shopping-cart fa-lg" style="color: white;"></i>
-          <span class="badge">3</span>
+          <span class="badge"><?php echo isset($_SESSION['ItemsInCart'])?$_SESSION['ItemsInCart']:"";?></span>
         </a>
         <a href="booking-history.php">
           <i class="fa fa-file-text-o fa-lg" style="color: white;"></i>

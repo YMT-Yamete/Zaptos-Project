@@ -2,8 +2,68 @@
 include 'connect.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
+    // get product information
+    if (isset($_GET['ProductID'])) {
+        $productID = $_GET['ProductID'];
+        $selectProduct = "SELECT * FROM Products WHERE ProductID = '$productID'";
+        $query = $connection->query($selectProduct);
+        while ($row = $query->fetch_assoc()) {
+            $name = $row['ProductName'];
+            $description = $row['ProductDescription'];
+            $price = $row['Price'];
+            $stock = $row['Stock'];
+            $productImg = $row['ProductImage'];
+        }
+    }
 } else {
     echo "<script>window.location = 'login.php'</script>";
+}
+
+if (isset($_POST['btnSubmit'])) {
+    $id = $_POST['inputID'];
+    $name = $_POST['inputName'];
+    $description = $_POST['inputDescription'];
+    $price = $_POST['inputPrice'];
+    $stock = $_POST['inputStock'];
+    $chosenImg = $_FILES['inputImg']['name'];
+
+    // echo $id;
+    // echo $name;
+    // echo $description;
+    // echo $price;
+    // echo $stock;
+    // echo $chosenImg;
+    if ($chosenImg == null) {
+        $updateQuery = "UPDATE Products 
+                        SET ProductName = '$name' 
+                        , ProductDescription = '$description' 
+                        , Price = '$price' 
+                        , Stock = '$stock'
+                        WHERE ProductID = '$id'";
+        if ($connection->query($updateQuery)) {
+            echo "<script>alert('Product Updated')</script>";
+            echo "<script>window.location = 'stocks.php'</script>";
+        } else {
+            echo $connection->error;
+        }
+    } 
+    else {
+        $savedDestination = '../Imgs/Product/' . $id . '.jpg';
+        $copiedImg = copy($_FILES['inputImg']['tmp_name'], $savedDestination);
+        $updateQuery = $updateQuery = "UPDATE Products 
+                                        SET ProductName = '$name' 
+                                        , ProductDescription = '$description' 
+                                        , Price = '$price' 
+                                        , Stock = '$stock' 
+                                        , ProductImage = '$savedDestination'
+                                        WHERE ProductID = '$id'";
+        if ($connection->query($updateQuery)) {
+            echo "<script>alert('Product Updated')</script>";
+            echo "<script>window.location = 'stocks.php'</script>";
+        } else {
+            echo $connection->error;
+        }
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -90,7 +150,7 @@ if (isset($_SESSION['AdminID'])) {
                 </li>
                 <li style="text-align:center;">
                     <br>
-                    <a href="logout.php"><button type="submit" class="btn" name="btnSubmit" style="background-color: #005C67; color: white;">Logout</button></a>
+                    <a href="logout.php"><button type="submit" class="btn" style="background-color: #005C67; color: white;">Logout</button></a>
                 </li>
             </ul>
         </nav>
@@ -98,27 +158,32 @@ if (isset($_SESSION['AdminID'])) {
         <div id="content" class="p-4 p-md-5 pt-5">
             <div class="container">
                 <h2 class="pageHeader"> Edit Product</h2>
-                <div class="mb-3">
-                    <label for="name" class="form-label">Product Name</label>
-                    <input type="text" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Product Description</label><br>
-                    <textarea name="" id="" style="width: 100%; border-color: #ced4da;" rows="5"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="price" class="form-label">Price</label>
-                    <input type="text" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label for="stock" class="form-label">In stock</label>
-                    <input type="number" class="form-control" min="0">
-                </div>
-                <div class="mb-3">
-                    <label for="formFile" class="form-label">Product Image</label>
-                    <input class="form-control" type="file" id="formFile">
-                </div>
-                <button type="button" class="btn" style="background-color: #005C67; color: white;">Save</button>
+                <form action="edit-product.php?ProductID=<?php echo $productID; ?>" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <input type="text" name="inputID" class="form-control" value="<?php echo $productID ?>" hidden>
+                    </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Product Name</label>
+                        <input type="text" name="inputName" class="form-control" value="<?php echo $name ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Product Description</label><br>
+                        <textarea name="inputDescription" style="width: 100%; border-color: #ced4da;" rows="5"><?php echo $description ?></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Price</label>
+                        <input type="text" name="inputPrice" class="form-control" value="<?php echo $price ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="stock" class="form-label">In stock</label>
+                        <input type="number" name="inputStock" class="form-control" min="0" value="<?php echo $stock ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Product Image</label>
+                        <input class="form-control" name="inputImg" type="file" id="formFile" value="<?php echo $productImg ?>">
+                    </div>
+                    <button type="submit" name="btnSubmit" class="btn" style="background-color: #005C67; color: white;">Save</button>
+                </form>
             </div>
         </div>
     </div>

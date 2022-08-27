@@ -1,8 +1,15 @@
 <?php
+include 'connect.php';
 session_start();
 if (isset($_SESSION['UserID'])) {
   $redirectFile = 'profile.php';
   $redirectName = 'Profile';
+
+  //fetch shopping history
+  $userID = $_SESSION['UserID'];
+  $select = "SELECT * FROM Orders WHERE UserID = '$userID' ORDER BY OrderID DESC";
+  $query = $connection->query($select);
+  $count = $query->num_rows;
 } else {
   $redirectFile = 'login.php';
   $redirectName = 'Login';
@@ -18,30 +25,16 @@ if (isset($_SESSION['UserID'])) {
   <title>Zaptos</title>
 
   <!-- boostrap 4 -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
   <!-- boostrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
-    integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
-    crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 
   <!-- css -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -85,7 +78,7 @@ if (isset($_SESSION['UserID'])) {
         </a>
         <a href="shopping-cart.php" class="notification">
           <i class="fa fa-shopping-cart fa-lg" style="color: white;"></i>
-          <span class="badge">3</span>
+          <span class="badge"><?php echo isset($_SESSION['ItemsInCart']) ? $_SESSION['ItemsInCart'] : ""; ?></span>
         </a>
         <a href="booking-history.php">
           <i class="fa fa-file-text-o fa-lg" style="color: white;"></i>
@@ -118,45 +111,27 @@ if (isset($_SESSION['UserID'])) {
     <div class="card">
       <div class="row">
         <div class="col-md-12 cart p-5">
-          <div class="row border-top border-bottom">
-            <div class="row main align-items-center">
-              <div class="col-2 p-3">
-                <img class="img-fluid" src="../Imgs/Assets/shopping-cart.jpg" width="300px" height="500px">
+          <?php
+          if ($count <= 0) {
+            echo "<h3 style='text-align: center;'>No Orders Yet</h3>";
+          }
+          while ($row = $query->fetch_assoc()) {
+            echo
+            "<div class='row border-top border-bottom'>
+              <div class='row main align-items-center'>
+                <div class='col-2 p-3'>
+                  <img class='img-fluid' src='../Imgs/Assets/shopping-cart.jpg' width='300px' height='500px'>
+                </div>
+                <div class='col'>
+                  <div class='row text-muted'>$row[OrderID]</div>
+                </div>
+                <div class='col'>$row[Date]</div>
+                <div class='col'>$row[OrderStatus]</div>
+                <div class='col'>$row[Cost] MMK <a href='shopping-receipt.php?OrderID=$row[OrderID]'><span class='close'>&rarr;</span></a></div>
               </div>
-              <div class="col">
-                <div class="row text-muted">S-000836</div>
-              </div>
-              <div class="col">12/12/2020</div>
-              <div class="col">Order Placed</div>
-              <div class="col">3000 MMK <a href="shopping-receipt.php"><span class="close">&rarr;</span></a></div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="row main align-items-center">
-              <div class="col-2 p-3">
-                <img class="img-fluid" src="../Imgs/Assets/shopping-cart.jpg" width="300px" height="500px">
-              </div>
-              <div class="col">
-                <div class="row text-muted">S-000836</div>
-              </div>
-              <div class="col">12/12/2020</div>
-              <div class="col">Shipped</div>
-              <div class="col">3000 MMK <a href="shopping-receipt.php"><span class="close">&rarr;</span></a></div>
-            </div>
-          </div>
-          <div class="row border-top border-bottom">
-            <div class="row main align-items-center">
-              <div class="col-2 p-3">
-                <img class="img-fluid" src="../Imgs/Assets/shopping-cart.jpg" width="300px" height="500px">
-              </div>
-              <div class="col">
-                <div class="row text-muted">S-000836</div>
-              </div>
-              <div class="col">12/12/2020</div>
-              <div class="col">Delivered</div>
-              <div class="col">3000 MMK <a href="shopping-receipt.php"><span class="close">&rarr;</span></a></div>
-            </div>
-          </div>
+            </div>";
+          }
+          ?>
           <div class="row border-top border-bottom">
           </div>
           <br>

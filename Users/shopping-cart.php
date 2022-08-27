@@ -1,13 +1,24 @@
 <?php
 session_start();
+include 'connect.php';
 if (isset($_SESSION['UserID'])) {
   $redirectFile = 'profile.php';
   $redirectName = 'Profile';
+  $userID = $_SESSION['UserID'];
 } else {
   $redirectFile = 'login.php';
   $redirectName = 'Login';
   echo "<script>alert('Please login first.');</script>";
   echo "<script>window.location = 'login.php';</script>";
+}
+
+// remove item from shopping cart
+if (isset($_GET['removeItem']) && isset($_GET['itemCount'])) {
+  $removingItemID = $_GET['removeItem'];
+  $removediItemCount = $_GET['itemCount'];
+  $_SESSION['ItemsInCart'] -= $removediItemCount;
+  unset($_SESSION["Cart"][$removingItemID]);
+  echo "<script>window.location = 'shopping-cart.php'</script>";
 }
 ?>
 <!DOCTYPE html>
@@ -18,30 +29,16 @@ if (isset($_SESSION['UserID'])) {
   <title>Zaptos</title>
 
   <!-- boostrap 4 -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
   <!-- boostrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
-    integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
-    crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 
   <!-- css -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -85,7 +82,7 @@ if (isset($_SESSION['UserID'])) {
         </a>
         <a href="shopping-cart.php" class="notification">
           <i class="fa fa-shopping-cart fa-lg" style="color: white;"></i>
-          <span class="badge">3</span>
+          <span class="badge"><?php echo isset($_SESSION['ItemsInCart']) ? $_SESSION['ItemsInCart'] : ""; ?></span>
         </a>
         <a href="booking-history.php">
           <i class="fa fa-file-text-o fa-lg" style="color: white;"></i>
@@ -107,65 +104,75 @@ if (isset($_SESSION['UserID'])) {
       </div>
     </div>
     <div class="card">
+      <?php
+      if ($_SESSION['ItemsInCart'] == 0) {
+        $shoppingCartHideStatus = "hidden";
+        $noItemsHideStatus = "";
+      } else {
+        $shoppingCartHideStatus = "";
+        $noItemsHideStatus = "hidden";
+      }
+      ?>
       <div class="row">
-        <div class="col-md-12 cart p-5">
-          <div class="row border-top border-bottom">
-            <div class="row main align-items-center">
-              <div class="col-2 p-3">
-                <img class="img-fluid" src="../Imgs/Assets/air-outlet-decoration.jpg" width="300px" height="500px">
-              </div>
-              <div class="col">
-                <div class="row text-muted">Air-Outlet</div>
-                <div class="row">3000 MMK</div>
-              </div>
-              <div class="col">
-                <div class="number">
-                  <span class="minus">-</span>
-                  <input type="text" value="1" class="amountSpecify" disabled>
-                  <span class="plus">+</span>
+        <h2 style="font-size: 24px; text-align:center; padding: 100px;" <?php echo $noItemsHideStatus ?>>No items added to the shopping cart</h2>
+        <div class="col-md-12 cart p-5" <?php echo $shoppingCartHideStatus ?>>
+          <?php
+          $subTotal = 0;
+          for ($i = 0; $i < count($_SESSION['Cart']); $i++) {
+
+            // get productIDs and its related information
+            $productID = array_keys($_SESSION['Cart'])[$i];
+            $quantity = $_SESSION['Cart'][$productID]['Quantity'];
+            $select = "SELECT * FROM Products WHERE ProductID = '$productID'";
+            $query = $connection->query($select);
+            while ($row = $query->fetch_assoc()) {
+              $name = $row['ProductName'];
+              $price = $row['Price'];
+              $img = $row['ProductImage'];
+            }
+            $multipliedPrice = $price * $quantity;
+
+            // get discount percent
+            $select = "SELECT * FROM Memberships m, MembershipTypes mt 
+            WHERE m.MembershipTypeID = mt.MembershipTypeID
+            AND m.UserID = '$userID'
+            AND m.MembershipStatus = 'Active'";
+            $query = $connection->query($select);
+            if ($query->num_rows > 0) {
+              while ($row = $query->fetch_assoc()) {
+                $discount = $row['DiscountPercent'];
+                $freeDeliStatus = $row['FreeDeliveryStatus'];
+              }
+            } else {
+              $discount = 0;
+            }
+
+            // calculate total price
+            $subTotal += $multipliedPrice;
+            $deliveryFee = ($freeDeliStatus == "Free") ? 0 : 2000;
+            $total = ($subTotal + $deliveryFee) - (($subTotal + $deliveryFee) * ($discount / 100));
+            echo
+            "<div class='row border-top border-bottom'>
+              <div class='row main align-items-center'>
+                <div class='col-2 p-3'>
+                  <img class='img-fluid' src=$img width='300px' height='500px'>
+                </div>
+                <div class='col'>
+                  <div class='row text-muted'>$name</div>
+                  <div class='row'>$price MMK</div>
+                </div>
+                <div class='col'>
+                  <div class='number'>
+                    <input type='text' value=$quantity class='amountSpecify' disabled>
+                  </div>
+                </div>
+                <div class='col'>$multipliedPrice MMK 
+                  <a href='shopping-cart.php?removeItem=$productID&itemCount=$quantity'><span class='close'>&#10005;</span></a>
                 </div>
               </div>
-              <div class="col">3000 MMK <span class="close">&#10005;</span></div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="row main align-items-center">
-              <div class="col-2 p-3">
-                <img class="img-fluid" src="../Imgs/Assets/air-outlet-decoration.jpg" width="300px" height="500px">
-              </div>
-              <div class="col">
-                <div class="row text-muted">Air-Outlet</div>
-                <div class="row">3000 MMK</div>
-              </div>
-              <div class="col">
-                <div class="number">
-                  <span class="minus">-</span>
-                  <input type="text" value="1" class="amountSpecify" disabled>
-                  <span class="plus">+</span>
-                </div>
-              </div>
-              <div class="col">3000 MMK <span class="close">&#10005;</span></div>
-            </div>
-          </div>
-          <div class="row border-top border-bottom">
-            <div class="row main align-items-center">
-              <div class="col-2 p-3">
-                <img class="img-fluid" src="../Imgs/Assets/car-cover.jpg" width="300px" height="500px">
-              </div>
-              <div class="col">
-                <div class="row text-muted">Car-Cover</div>
-                <div class="row">4000 MMK</div>
-              </div>
-              <div class="col">
-                <div class="number">
-                  <span class="minus">-</span>
-                  <input type="text" value="1" class="amountSpecify" disabled>
-                  <span class="plus">+</span>
-                </div>
-              </div>
-              <div class="col">4000 MMK <span class="close">&#10005;</span></div>
-            </div>
-          </div>
+            </div>";
+          }
+          ?>
           <div class="row border-top border-bottom">
             <div class="row main align-items-center">
               <div class="col-2 p-3">
@@ -178,7 +185,7 @@ if (isset($_SESSION['UserID'])) {
                 <a><span class="text-muted">Sub Total</span></a><br>
                 <a>&nbsp;</a><br>
               </div>
-              <div class="col">10000 MMK</div>
+              <div class="col"><?php echo $subTotal; ?> MMK</div>
             </div>
             <div class="row main align-items-center">
               <div class="col-2 p-3">
@@ -190,7 +197,7 @@ if (isset($_SESSION['UserID'])) {
                 <a><span class="text-muted">Delivery</span></a><br>
                 <a>&nbsp;</a><br>
               </div>
-              <div class="col">2000 MMK</div>
+              <div class="col"><?php echo $deliveryFee; ?> MMK</div>
             </div>
             <div class="row main align-items-center">
               <div class="col-2 p-3">
@@ -202,7 +209,7 @@ if (isset($_SESSION['UserID'])) {
                 <a><span class="text-muted">Discount</span></a><br>
                 <a>&nbsp;</a><br>
               </div>
-              <div class="col">0%</div>
+              <div class="col"><?php echo $discount ?>%</div>
             </div>
             <div class="row main align-items-center">
               <div class="col-2 p-3">
@@ -215,7 +222,7 @@ if (isset($_SESSION['UserID'])) {
                 <a>&nbsp;</a><br>
                 <a>&nbsp;</a><br>
               </div>
-              <div class="col" style="background-color: #00cfe7; padding: 10px;">12000 MMK</div>
+              <div class="col" style="background-color: #00cfe7; padding: 10px;"><?php echo $total ?> MMK</div>
             </div>
           </div>
           <div class="back-to-shop">

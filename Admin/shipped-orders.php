@@ -2,8 +2,27 @@
 include 'connect.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
+    if (isset($_SESSION['AdminID'])) {
+        $select = "SELECT * FROM Orders o, Users u
+                    WHERE o.UserID = u.UserID
+                    AND OrderStatus = 'Shipped'";
+        $query = $connection->query($select);
+    } else {
+        echo "<script>window.location = 'login.php'</script>";
+    }
 } else {
     echo "<script>window.location = 'login.php'</script>";
+}
+
+if (isset($_POST['btnDelivered'])) {
+    $orderID = $_POST['inputOrderID'];
+    $update = "UPDATE Orders SET OrderStatus = 'Delivered' WHERE OrderID = '$orderID'";
+    if ($connection->query($update)) {
+        echo "<script>alert('Set Order As Delivered');</script>";
+        echo "<script>window.location = 'shipped-orders.php';</script>";
+    } else {
+        echo $connection->error;
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -98,72 +117,40 @@ if (isset($_SESSION['AdminID'])) {
         <div id="content" class="p-4 p-md-5 pt-5">
             <div class="container">
                 <h2 class="pageHeader">Shipped Orders</h2>
-                <table id="tableID" class="table table-bordered table-striped table-responsive-stack">
-                    <thead class="tableHeaders">
-                        <tr>
-                            <th>OrderID</th>
-                            <th>UserID</th>
-                            <th>Name</th>
-                            <th>Address</th>
-                            <th>Date</th>
-                            <th>Discount</th>
-                            <th>Cost</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>O-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Yangon</td>
-                            <td>12.12.2022</td>
-                            <td>0%</td>
-                            <td>1000 MMK</td>
-                            <td><a href="">Set As Delivered</a></td>
-                        </tr>
-                        <tr>
-                            <td>O-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Yangon</td>
-                            <td>12.12.2022</td>
-                            <td>0%</td>
-                            <td>1000 MMK</td>
-                            <td><a href="">Set As Delivered</a></td>
-                        </tr>
-                        <tr>
-                            <td>O-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Yangon</td>
-                            <td>12.12.2022</td>
-                            <td>0%</td>
-                            <td>1000 MMK</td>
-                            <td><a href="">Set As Delivered</a></td>
-                        </tr>
-                        <tr>
-                            <td>O-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Yangon</td>
-                            <td>12.12.2022</td>
-                            <td>0%</td>
-                            <td>1000 MMK</td>
-                            <td><a href="">Set As Delivered</a></td>
-                        </tr>
-                        <tr>
-                            <td>O-0000001</td>
-                            <td>U-0000001</td>
-                            <td>John</td>
-                            <td>Yangon</td>
-                            <td>12.12.2022</td>
-                            <td>0%</td>
-                            <td>1000 MMK</td>
-                            <td><a href="">Set As Delivered</a></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <form action="shipped-orders.php" method="POST">
+                    <table id="tableID" class="table table-bordered table-striped table-responsive-stack">
+                        <thead class="tableHeaders">
+                            <tr>
+                                <th>OrderID</th>
+                                <th>UserID</th>
+                                <th>Name</th>
+                                <th>Address</th>
+                                <th>Date</th>
+                                <th>Discount</th>
+                                <th>Cost</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            while ($row = $query->fetch_assoc()) {
+                                echo
+                                "<tr>
+                                    <input type='text' name='inputOrderID' value='$row[OrderID]' hidden>
+                                    <td>$row[OrderID]</td>
+                                    <td>$row[UserID]</td>
+                                    <td>$row[Name]</td>
+                                    <td>$row[Address]</td>
+                                    <td>$row[Date]</td>
+                                    <td>$row[Discount]%</td>
+                                    <td>$row[Cost] MMK</td>
+                                    <td><input type='submit' class='actionButton' name='btnDelivered' style='background-color: transparent;' value='Set As Delivered'></td>
+                                </tr>";
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </form>
             </div>
         </div>
     </div>

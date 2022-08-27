@@ -2,6 +2,8 @@
 include 'connect.php';
 session_start();
 if (isset($_SESSION['AdminID'])) {
+    $productSelect = "SELECT * FROM Products";
+    $query = $connection->query($productSelect);
 } else {
     echo "<script>window.location = 'login.php'</script>";
 }
@@ -114,66 +116,27 @@ if (isset($_SESSION['AdminID'])) {
                             <th>Name</th>
                             <th>Description</th>
                             <th>Price</th>
-                            <th>In Stock</th>
+                            <th>Stock</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>
-                                <img src="../Imgs/Assets/car-cover.jpg" alt="" width="200px">
-                            </td>
-                            <td>P-0000001</td>
-                            <td>Car Cover</td>
-                            <td>Car Cover is very good product</td>
-                            <td>1000 MMK</td>
-                            <td>100</td>
-                            <td><a href="edit-product.php">Edit Product</a></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <img src="../Imgs/Assets/car-cover.jpg" alt="" width="200px">
-                            </td>
-                            <td>P-0000001</td>
-                            <td>Car Cover</td>
-                            <td>Car Cover is very good product</td>
-                            <td>1000 MMK</td>
-                            <td>100</td>
-                            <td><a href="edit-product.php">Edit Product</a></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <img src="../Imgs/Assets/car-cover.jpg" alt="" width="200px">
-                            </td>
-                            <td>P-0000001</td>
-                            <td>Car Cover</td>
-                            <td>Car Cover is very good product</td>
-                            <td>1000 MMK</td>
-                            <td>100</td>
-                            <td><a href="edit-product.php">Edit Product</a></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <img src="../Imgs/Assets/car-cover.jpg" alt="" width="200px">
-                            </td>
-                            <td>P-0000001</td>
-                            <td>Car Cover</td>
-                            <td>Car Cover is very good product</td>
-                            <td>1000 MMK</td>
-                            <td>100</td>
-                            <td><a href="edit-product.php">Edit Product</a></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <img src="../Imgs/Assets/car-cover.jpg" alt="" width="200px">
-                            </td>
-                            <td>P-0000001</td>
-                            <td>Car Cover</td>
-                            <td>Car Cover is very good product</td>
-                            <td>1000 MMK</td>
-                            <td>100</td>
-                            <td><a href="edit-product.php">Edit Product</a></td>
-                        </tr>
+                        <?php
+                        while ($row = $query->fetch_assoc()) {
+                            echo "
+                                <tr>
+                                    <td>
+                                        <img src=$row[ProductImage] alt='' width='200px'>
+                                    </td>
+                                    <td>$row[ProductID]</td>
+                                    <td>$row[ProductName]</td>
+                                    <td>$row[ProductDescription]</td>
+                                    <td>$row[Price] MMK</td>
+                                    <td>$row[Stock]</td>
+                                    <td><a href='edit-product.php?ProductID=$row[ProductID]'>Edit Product</a></td>
+                                </tr>";
+                        }
+                        ?>
                     </tbody>
                 </table>
             </div>

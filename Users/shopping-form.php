@@ -1,14 +1,108 @@
 <?php
+include 'connect.php';
+include 'auto-id.php';
 session_start();
 if (isset($_SESSION['UserID'])) {
   $redirectFile = 'profile.php';
   $redirectName = 'Profile';
+
+  if ($_SESSION['ItemsInCart'] == 0) {
+    echo "<script>alert('Please add item to your shopping cart first.')</script>";
+    echo "<script>window.location = 'shopping.php'</script>";
+  }
+
+  $userID = $_SESSION['UserID'];
+  $select = "SELECT * FROM Users WHERE UserID = '$userID'";
+  $query = $connection->query($select);
+  while ($row = $query->fetch_assoc()) {
+    $name = $row['Name'];
+    $email = $row['Email'];
+  }
 } else {
   $redirectFile = 'login.php';
   $redirectName = 'Login';
   echo "<script>alert('Please login first.');</script>";
   echo "<script>window.location = 'login.php';</script>";
 }
+
+// submit shopping form
+if (isset($_POST['btnSubmit'])) {
+  // get form data
+  $orderID = AutoID('O', 6, 'Orders', 'OrderID');
+  $userID = $_SESSION['UserID'];
+  $name = $_POST['inputName'];
+  $email = $_POST['inputEmail'];
+  $address = $_POST['inputAddress'];
+  $date = $date = date("Y-m-d");
+  $discount = null;
+  $cost = null;
+  $orderStatus = 'Order Placed';
+
+  // declar required var and arrays
+  $subTotal = 0;
+  $orderProductInsertArray = array();
+  $stockUpdateArray = array();
+
+  // loop all the items in the cart
+  for ($i = 0; $i < count($_SESSION['Cart']); $i++) {
+
+    // get productIDs and its related information
+    $productID = array_keys($_SESSION['Cart'])[$i];
+    $quantity = $_SESSION['Cart'][$productID]['Quantity'];
+    $select = "SELECT * FROM Products WHERE ProductID = '$productID'";
+    $query = $connection->query($select);
+    while ($row = $query->fetch_assoc()) {
+      $name = $row['ProductName'];
+      $price = $row['Price'];
+      $img = $row['ProductImage'];
+      $stock = $row['Stock'];
+    }
+    $multipliedPrice = $price * $quantity;
+
+    // get discount percent
+    $select = "SELECT * FROM Memberships m, MembershipTypes mt 
+    WHERE m.MembershipTypeID = mt.MembershipTypeID
+    AND m.UserID = '$userID'
+    AND m.MembershipStatus = 'Active'";
+    $query = $connection->query($select);
+    if ($query->num_rows > 0) {
+      while ($row = $query->fetch_assoc()) {
+        $discount = $row['DiscountPercent'];
+        $freeDeliStatus = $row['FreeDeliveryStatus'];
+      }
+    } else {
+      $discount = 0;
+    }
+
+    $stockRemaining = $stock - $quantity;
+
+    // put OrderProduct insert queries into array + update stock
+    $orderProductInsertArray[$i] = "INSERT INTO OrderProduct (OrderID, ProductID, Quantity) VALUES ('$orderID', '$productID', '$quantity')";
+    $stockUpdateArray[$i] = "UPDATE Products SET Stock = '$stockRemaining' WHERE ProductID = '$productID'";
+
+    // calculate total price
+    $subTotal += $multipliedPrice;
+    $deliveryFee = ($freeDeliStatus == "Free") ? 0 : 2000;
+    $total = ($subTotal + $deliveryFee) - (($subTotal + $deliveryFee) * ($discount / 100));
+  }
+
+  //insert Orders
+    $orderInsert = "INSERT INTO Orders VALUES ('$orderID', '$userID','$address', '$date', '$discount', '$total', '$orderStatus')";
+    $orderQuery = $connection->query($orderInsert);
+    if ($orderQuery) {
+      for ($j = 0; $j < count($orderProductInsertArray); $j++) {
+        $connection->query($orderProductInsertArray[$j]);
+        $connection->query($stockUpdateArray[$j]);
+      }
+      $_SESSION['ItemsInCart'] = 0;
+      unset($_SESSION["Cart"]);
+      echo "<script>alert('Order Placed')</script>";
+      echo "<script>window.location = 'shopping.php'</script>";
+    }
+    else {
+      echo $connection->error;
+    }
+  }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,30 +112,16 @@ if (isset($_SESSION['UserID'])) {
   <title>Zaptos</title>
 
   <!-- boostrap 4 -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
   <!-- boostrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
-    integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
-    crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 
   <!-- css -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -84,7 +164,7 @@ if (isset($_SESSION['UserID'])) {
         </a>
         <a href="shopping-cart.php" class="notification">
           <i class="fa fa-shopping-cart fa-lg" style="color: white;"></i>
-          <span class="badge">3</span>
+          <span class="badge"><?php echo isset($_SESSION['ItemsInCart']) ? $_SESSION['ItemsInCart'] : ""; ?></span>
         </a>
         <a href="booking-history.php">
           <i class="fa fa-file-text-o fa-lg" style="color: white;"></i>
@@ -104,22 +184,22 @@ if (isset($_SESSION['UserID'])) {
         </div>
       </div>
     </div>
-    <form>
+    <form action="shopping-form.php" method="POST">
       <div class="mb-3">
         <label for="name" class="form-label">Name</label>
-        <input type="text" class="form-control" required>
+        <input type="text" class="form-control" name="inputName" value='<?php echo $name ?>' readonly>
       </div>
       <div class="mb-3">
         <label for="email" class="form-label">Email</label>
-        <input type="email" class="form-control" required>
+        <input type="email" class="form-control" name="inputEmail" value='<?php echo $email ?>' readonly>
       </div>
       <div class="mb-3">
         <label for="address" class="form-label">Shipping Address</label>
         <div class="form-group">
-          <textarea class="form-control" rows="3"></textarea>
+          <textarea class="form-control" rows="3" name="inputAddress"></textarea>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary" style="background-color: #005C67;">Submit</button>
+      <button type="submit" class="btn btn-primary" name="btnSubmit" style="background-color: #005C67;">Submit</button>
     </form>
   </div>
   <!-- Site footer -->

@@ -1,13 +1,127 @@
 <?php
+include 'connect.php';
 session_start();
 if (isset($_SESSION['UserID'])) {
   $redirectFile = 'profile.php';
   $redirectName = 'Profile';
+  $userID = $_SESSION['UserID'];
+
+  // add to favourite
+  if (isset($_POST['btnFavourite'])) {
+    $productID = $_GET['ProductID'];
+    $selectFav = "SELECT * FROM Favourites WHERE UserID = '$userID' AND ProductID = '$productID'";
+    $queryFav = $connection->query($selectFav);
+    if ($queryFav->num_rows == 0) {
+      $isFav = 'false';
+    } else {
+      $isFav = 'true';
+    }
+    if ($isFav == 'false') {
+      $insert = "INSERT INTO Favourites VALUES ('$userID', '$productID')";
+      $connection->query($insert);
+      echo "<script>alert('Added to favourite')</script>";
+      echo "<script>history.back()</script>";
+    } else if ($isFav == 'true') {
+      $remove = "DELETE FROM Favourites 
+              WHERE UserID = '$userID' AND ProductID = '$productID'";
+      $connection->query($remove);
+      echo "<script>alert('Removed from favourite')</script>";
+      echo "<script>history.back()</script>";
+    }
+  }
+
+  // get from favourite table to check if it is already an favourite or not
+  if (isset($_GET['ProductID'])) {
+    $productID = $_GET['ProductID'];
+    $selectFav = "SELECT * FROM Favourites WHERE UserID = '$userID' AND ProductID = '$productID'";
+    $queryFav = $connection->query($selectFav);
+    if ($queryFav->num_rows == 0) {
+      $isFav = 'false';
+    } else {
+      $isFav = 'true';
+    }
+    $heartColor = $isFav == 'true' ? 'red' : 'white';
+  }
+
+  // get average rating
+  if (isset($_GET['ProductID'])) {
+    $productID = $_GET['ProductID'];
+    $selectRating = "SELECT * FROM OrderProduct WHERE ProductID = '$productID' AND Rating > 0";
+    $queryRating = $connection->query($selectRating);
+    $totalRows = $queryRating->num_rows;
+
+    $averageRating = 0;
+    $totalStars = 0;
+    while ($row = $queryRating->fetch_assoc()) {
+      $totalStars += $row['Rating'];
+    }
+    if ($totalRows > 0) {
+      $averageRating = round($totalStars / $totalRows);
+    }
+    $brightStar = $averageRating;
+    $darkStar = 5 - $averageRating;
+  }
+
+  // get the information of the product by specifying an id
+  if (isset($_GET['ProductID'])) {
+    $productID = $_GET['ProductID'];
+    $select = "SELECT * FROM Products WHERE ProductID = '$productID'";
+    $query = $connection->query($select);
+    while ($row = $query->fetch_assoc()) {
+      $name = $row['ProductName'];
+      $description = $row['ProductDescription'];
+      $price = $row['Price'];
+      $stock = $row['Stock'];
+      $img = $row['ProductImage'];
+    }
+  }
 } else {
   $redirectFile = 'login.php';
   $redirectName = 'Login';
   echo "<script>alert('Please login first.');</script>";
   echo "<script>window.location = 'login.php';</script>";
+}
+
+// add to cart
+if (isset($_POST['btnAddToCart'])) {
+  $select = "SELECT * FROM Products WHERE ProductID = '$productID'";
+  $query = $connection->query($select);
+  while ($row = $query->fetch_assoc()) {
+    $stock = $row['Stock'];
+  }
+  $itemCount = $_POST['inputItemCount'];
+  //if item is not already in cart
+  if (!isset($_SESSION['Cart'][$productID]['Quantity'])) {
+    $_SESSION['Cart'][$productID] = array('Quantity' => 0);
+    $_SESSION['Cart'][$productID]['Quantity'] += $itemCount;
+
+    $itemLeftAfterAddingToCart = $stock - $_SESSION['Cart'][$productID]['Quantity'];
+    // if item is out of stock - remove the currently added items from the cart
+    if ($itemLeftAfterAddingToCart < 0) {
+      $_SESSION['Cart'][$productID]['Quantity'] -= $itemCount;
+      echo "<script>alert('Sorry. We only have $stock item(s) available currently.')</script>";
+      echo "<script>history.back()</script>";
+    } else {
+      $_SESSION['ItemsInCart'] += $itemCount;
+    }
+  }
+  //if item is already in cart
+  else {
+    $_SESSION['Cart'][$productID]['Quantity'] += $itemCount;
+
+    $itemLeftAfterAddingToCart = $stock - $_SESSION['Cart'][$productID]['Quantity'];
+    // if item is out of stock - remove the currently added items from the cart
+    if ($itemLeftAfterAddingToCart < 0) {
+      $_SESSION['Cart'][$productID]['Quantity'] -= $itemCount;
+      echo "<script>alert('Sorry. We only have $stock item(s) available currently.')</script>";
+      echo "<script>history.back()</script>";
+    } else {
+      $_SESSION['ItemsInCart'] += $itemCount;
+    }
+  }
+  $quantity =  $_SESSION['Cart'][$productID]['Quantity'];
+  echo "<script>alert('$quantity Item(s) added to a shopping cart')</script>";
+  echo "<script>history.back()</script>";
 }
 ?>
 <!DOCTYPE html>
@@ -18,30 +132,16 @@ if (isset($_SESSION['UserID'])) {
   <title>Zaptos</title>
 
   <!-- boostrap 4 -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
   <!-- boostrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
-    integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
-    crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 
   <!-- css -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -53,8 +153,10 @@ if (isset($_SESSION['UserID'])) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
     ">
 
-  <script src="js/add-to-cart-number.js"></script>
+  <!-- rating stars -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+  <script src="js/add-to-cart-number.js"></script>
 </head>
 
 <body>
@@ -84,7 +186,7 @@ if (isset($_SESSION['UserID'])) {
         </a>
         <a href="shopping-cart.php" class="notification">
           <i class="fa fa-shopping-cart fa-lg" style="color: white;"></i>
-          <span class="badge">3</span>
+          <span class="badge"><?php echo isset($_SESSION['ItemsInCart']) ? $_SESSION['ItemsInCart'] : ""; ?></span>
         </a>
         <a href="booking-history.php">
           <i class="fa fa-file-text-o fa-lg" style="color: white;"></i>
@@ -102,7 +204,7 @@ if (isset($_SESSION['UserID'])) {
         <div class="wrapper row">
           <div class="preview col-md-6">
             <div class="preview-pic tab-content">
-              <div class="tab-pane active" id="pic-1"><img src="../Imgs/Assets/car-cover.jpg" /></div>
+              <div class="tab-pane active"><img src=<?php echo $img ?> /></div>
               <div class="tab-pane" id="pic-2"><img src="http://placekitten.com/400/252" /></div>
               <div class="tab-pane" id="pic-3"><img src="http://placekitten.com/400/252" /></div>
               <div class="tab-pane" id="pic-4"><img src="http://placekitten.com/400/252" /></div>
@@ -110,21 +212,31 @@ if (isset($_SESSION['UserID'])) {
             </div>
           </div>
           <div class="details col-md-6">
-            <h3 class="product-title">Car Cover</h3>
-            <p class="product-description">A car cover is a product that can be used to cover a car, possibly protecting
-              it against the elements. It is often used when a vehicle isn't used for a certain amount of time and needs
-              to look dust- and dirtless.</p>
-            <h4 class="price">current price: <span>7000 MMK</span></h4>
-            <p class="deli">Estimated Delivery: 1 - 2 weeks</p>
-            <div class="action">
-              <div class="number">
-                <span class="minus">-</span>
-                <input type="text" value="1" class="amountSpecify" disabled>
-                <span class="plus">+</span>
-              </div>
-              <button class="add-to-cart btn btn-default" type="button">add to cart</button>
-              <button class="like btn btn-default" type="button"><span class="fa fa-heart"></span></button>
+            <h3 class="product-title"><?php echo $name ?></h3>
+            <div>
+              <?php
+              for ($i = 0; $i < $brightStar; $i++) {
+                echo "<span class='fa fa-star checked'></span>";
+              }
+              for ($i = 0; $i < $darkStar; $i++) {
+                echo "<span class='fa fa-star'></span>";
+              }
+              ?>
             </div>
+            <p class="product-description"><?php echo $description ?></p>
+            <h4 class="price">current price: <span><?php echo $price ?> MMK</span></h4>
+            <p class="deli">Estimated Delivery: 1 - 2 weeks</p>
+            <form action="product-details.php?ProductID=<?php echo $productID ?>" method="POST">
+              <div class="action">
+                <div class="number">
+                  <span class="minus">-</span>
+                  <input type="text" value="1" class="amountSpecify" name="inputItemCount" readonly>
+                  <span class="plus">+</span>
+                </div>
+                <button type="submit" class="add-to-cart btn btn-default" type="button" name="btnAddToCart">add to cart</button>
+                <button type="submit" class="like btn btn-default" type="button" name="btnFavourite"><span class="fa fa-heart" style="color:<?php echo $heartColor ?>;"></span></button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

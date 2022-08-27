@@ -1,13 +1,44 @@
 <?php
+include 'connect.php';
 session_start();
 if (isset($_SESSION['UserID'])) {
     $redirectFile = 'profile.php';
     $redirectName = 'Profile';
+
+    if(isset($_GET['ProductID']) && isset($_GET['OrderID'])) {
+        $productID = $_GET['ProductID'];
+        $orderID = $_GET['OrderID'];
+        $select = "SELECT * FROM Products WHERE ProductID = '$productID'";
+        $query = $connection->query($select);
+        while ($row = $query->fetch_assoc()) {
+            $img = $row['ProductImage'];
+            $productName = $row['ProductName'];
+        }
+    }
 } else {
     $redirectFile = 'login.php';
     $redirectName = 'Login';
     echo "<script>alert('Please login first.');</script>";
     echo "<script>window.location = 'login.php';</script>";
+}
+
+if (isset($_POST['btnSubmit'])) {
+    if (isset($_POST['rate'])) {
+        $rate = $_POST['rate'];
+        $update = "UPDATE OrderProduct SET Rating = '$rate' WHERE ProductID = '$productID' AND OrderID = '$orderID'";
+        if($connection->query($update)) {
+            echo "<script>alert('Thank you for your rating');</script>";
+            echo "<script>window.location = 'shopping-history.php';</script>";
+        }
+        else {
+            echo $connection->error;
+        }
+    }
+    else {
+        echo "<script>alert('Please rate from 1 to 5 stars')</script>";
+        echo "<script>history.back()</script>";
+    }
+    
 }
 ?>
 <!DOCTYPE html>
@@ -72,7 +103,7 @@ if (isset($_SESSION['UserID'])) {
                 </a>
                 <a href="shopping-cart.php" class="notification">
                     <i class="fa fa-shopping-cart fa-lg" style="color: white;"></i>
-                    <span class="badge">3</span>
+                    <span class="badge"><?php echo isset($_SESSION['ItemsInCart'])?$_SESSION['ItemsInCart']:"";?></span>
                 </a>
                 <a href="booking-history.php">
                     <i class="fa fa-file-text-o fa-lg" style="color: white;"></i>
@@ -89,36 +120,39 @@ if (isset($_SESSION['UserID'])) {
             <div class="col-md-12">
                 <div class="page-heading clearfix">
                     <br><br>
-                    <h1>Product Rating</h1>
+                    <h1>Product Rating</h1><br>
+                    <h2><?php echo $productName?></h2><br>
+                    <form action="rate-product.php?ProductID=<?php echo $productID;?>&OrderID=<?php echo $orderID?>" method="POST">
                     <table class="center">
                         <tr>
                             <td>
-                                <img src="../Imgs/Assets/air-outlet-decoration.jpg">
+                                <img src='<?php echo $img?>' class='img-fluid' width='300px' height='500px'>
                                 <br><br>
                             </td>
                         </tr>
                         <tr>
                             <td style="display: flex;">
                                 <div class="rate">
-                                    <input type="radio" id="star5" name="rate" value="5" />
+                                    <input type="radio" id="star5" name="rate" value="5"/>
                                     <label for="star5" title="text">5 stars</label>
-                                    <input type="radio" id="star4" name="rate" value="4" />
+                                    <input type="radio" id="star4" name="rate" value="4"/>
                                     <label for="star4" title="text">4 stars</label>
-                                    <input type="radio" id="star3" name="rate" value="3" />
+                                    <input type="radio" id="star3" name="rate" value="3"/>
                                     <label for="star3" title="text">3 stars</label>
-                                    <input type="radio" id="star2" name="rate" value="2" />
+                                    <input type="radio" id="star2" name="rate" value="2"/>
                                     <label for="star2" title="text">2 stars</label>
-                                    <input type="radio" id="star1" name="rate" value="1" />
+                                    <input type="radio" id="star1" name="rate" value="1"/>
                                     <label for="star1" title="text">1 star</label>
                                 </div><br><br><br>
                             </td>
                         </tr>
                         <tr>
-                            <td>
-                                <button type="button" class="btn btn-link">Submit</button>
+                            <td style="text-align: center;">
+                                <button type="submit" name="btnSubmit" class="btn btn-link">Submit</button>
                             </td>
                         </tr>
                     </table>
+                    </form>
                 </div>
             </div>
         </div>
