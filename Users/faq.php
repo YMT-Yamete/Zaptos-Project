@@ -161,7 +161,7 @@ if (isset($_SESSION['UserID'])) {
           <div class="accordion-body">
             <span style="font-weight: bold;">Answer: </span>Visit <a href="membership.php"><span
                 style="color: blue;">Membership</span></a> page. Choose what type of membership plan do you want. Fill
-            up the form. And make payment through KBZpay by scanning a QR code. Upload the payment screenshot and submit
+            up the form. And make payment through WavePay by scanning a QR code. Upload the payment screenshot and submit
             the form.
           </div>
         </div>

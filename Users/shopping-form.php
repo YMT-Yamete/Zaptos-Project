@@ -1,6 +1,7 @@
 <?php
 include 'connect.php';
 include 'auto-id.php';
+include 'email-notification.php';
 session_start();
 if (isset($_SESSION['UserID'])) {
   $redirectFile = 'profile.php';
@@ -52,7 +53,7 @@ if (isset($_POST['btnSubmit'])) {
     $select = "SELECT * FROM Products WHERE ProductID = '$productID'";
     $query = $connection->query($select);
     while ($row = $query->fetch_assoc()) {
-      $name = $row['ProductName'];
+      $productName = $row['ProductName'];
       $price = $row['Price'];
       $img = $row['ProductImage'];
       $stock = $row['Stock'];
@@ -72,6 +73,7 @@ if (isset($_POST['btnSubmit'])) {
       }
     } else {
       $discount = 0;
+      $freeDeliStatus = "";
     }
 
     $stockRemaining = $stock - $quantity;
@@ -87,22 +89,35 @@ if (isset($_POST['btnSubmit'])) {
   }
 
   //insert Orders
-    $orderInsert = "INSERT INTO Orders VALUES ('$orderID', '$userID','$address', '$date', '$discount', '$total', '$orderStatus')";
-    $orderQuery = $connection->query($orderInsert);
-    if ($orderQuery) {
-      for ($j = 0; $j < count($orderProductInsertArray); $j++) {
-        $connection->query($orderProductInsertArray[$j]);
-        $connection->query($stockUpdateArray[$j]);
-      }
-      $_SESSION['ItemsInCart'] = 0;
-      unset($_SESSION["Cart"]);
-      echo "<script>alert('Order Placed')</script>";
-      echo "<script>window.location = 'shopping.php'</script>";
+  $orderInsert = "INSERT INTO Orders VALUES ('$orderID', '$userID','$address', '$date', '$discount', '$total', '$orderStatus')";
+  $orderQuery = $connection->query($orderInsert);
+  if ($orderQuery) {
+    EmailNotification(
+      $email,
+      "Zaptos Booking",
+      "Dear $name, <br>
+
+          Thank you for your order. <br>
+
+          Order ID - $orderID, <br>
+          Date - $date, <br>
+          Cost - $total, <br>
+          Address - $address <br>
+          
+          If you ordered by mistake, you can cancel your order before it is shipped."
+    );
+    for ($j = 0; $j < count($orderProductInsertArray); $j++) {
+      $connection->query($orderProductInsertArray[$j]);
+      $connection->query($stockUpdateArray[$j]);
     }
-    else {
-      echo $connection->error;
-    }
+    $_SESSION['ItemsInCart'] = 0;
+    unset($_SESSION["Cart"]);
+    echo "<script>alert('Order Placed')</script>";
+    echo "<script>window.location = 'shopping.php'</script>";
+  } else {
+    echo $connection->error;
   }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

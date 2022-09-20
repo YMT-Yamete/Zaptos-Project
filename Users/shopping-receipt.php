@@ -17,6 +17,7 @@ if (isset($_SESSION['UserID'])) {
   $query = $connection->query($select);
 
   // get delivery fee
+  $freeDeliStatus = "";
   $selectDeli = "SELECT * FROM Memberships m, MembershipTypes mt 
     WHERE m.MembershipTypeID = mt.MembershipTypeID
     AND m.UserID = '$userID'

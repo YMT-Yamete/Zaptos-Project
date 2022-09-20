@@ -145,6 +145,7 @@ if (isset($_GET['removeItem']) && isset($_GET['itemCount'])) {
               }
             } else {
               $discount = 0;
+              $freeDeliStatus = "";
             }
 
             // calculate total price

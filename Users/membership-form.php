@@ -166,10 +166,11 @@ if (isset($_POST['btnSubmit'])) {
         <input type="text" class="form-control" name="inputCost" value='<?php echo $cost ?>' readonly>
       </div>
       <div>
-        <label for="email" class="form-label">Please scan the QR code below with KBZpay to make payment.</label>
+        <label for="email" class="form-label">Please scan the QR code below with WavePay to make payment.</label>
       </div>
       <div>
         <img src="../Imgs/Assets/payment.png" width="300px" height="300px">
+        <img src="../Imgs/Assets/WaveMoney.png" width="150px" height="150px">
       </div>
       <div class="mb-3">
         <label for="cost" class="form-label">Screrenshot</label>
