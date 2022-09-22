@@ -44,9 +44,9 @@ if (isset($_POST['btnSubmit'])) {
 
   $select = "SELECT * FROM Memberships
             WHERE UserID = '$userID'
-            AND MembershipStatus = 'Pending'
-            OR MembershipStatus = 'Active'";
-  if ($connection->query($select)->num_rows > 0) {
+            AND MembershipStatus IN ('Pending', 'Active')";
+  if ($connection->query($select)->num_rows > 0) 
+  {
     echo "<script>alert('You cannot submit application form right now.')</script>";
     echo "<script>window.location = 'home.php';</script>";
   } else {
