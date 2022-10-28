@@ -97,26 +97,26 @@ if (isset($_SESSION['UserID'])) {
     <div class="row">
       <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
         <a href="booking-form.php?serviceID=1" style="text-decoration : none; color: black;">
-          <div class="card" style="width: 20rem; margin: auto;">
-            <img class="card-img-top" src="../Imgs/Assets/basic-car-wash.jpeg">
+          <div class="card" style="width: 17rem; margin: auto;">
+            <img class="card-img-top" src="../Imgs/Assets/basic-car-wash.jpeg" style="width: 17rem; margin: auto;">
             <div class="card-body">
               <p class="product-name">Basic</p>
               <p class="product-price">5000 MMK</p><br>
-              <p class="service-description">Complete car exterior cleaning</p><br>
+              <p class="service-description">Complete car exterior cleaning</p><br><br>
             </div>
           </div>
         </a>
       </div>
       <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
         <a href="booking-form.php?serviceID=2" style="text-decoration : none; color: black;">
-          <div class="card" style="width: 20rem; margin: auto;">
-            <img class="card-img-top" src="../Imgs/Assets/advance-car-wash.jpg">
+          <div class="card" style="width: 17rem; margin: auto;">
+            <img class="card-img-top" src="../Imgs/Assets/advance-car-wash.jpg" style="width: 17rem; margin: auto;">
             <div class="card-body">
               <p class="product-name">Advanced</p>
               <p class="product-price">8000 MMK</p><br>
               <ul>
                 <li>
-                  <p class="service-description">Exterior cleaning and polishing</p><br>
+                  <p class="service-description">Exterior cleaning and polishing</p><br><br>
                 </li>
               </ul>
             </div>
@@ -125,20 +125,20 @@ if (isset($_SESSION['UserID'])) {
       </div>
       <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
         <a href="booking-form.php?serviceID=3" style="text-decoration : none; color: black;">
-          <div class="card" style="width: 20rem; margin: auto;">
-            <img class="card-img-top" src="../Imgs/Assets/extended-car-wash.jpg">
+          <div class="card" style="width: 17rem; margin: auto;">
+            <img class="card-img-top" src="../Imgs/Assets/extended-car-wash.jpg" style="width: 17rem; margin: auto;">
             <div class="card-body">
               <p class="product-name">Extended</p>
               <p class="product-price">8000 MMK</p><br>
-              <p class="service-description">Exterior and interior cleaning</p><br>
+              <p class="service-description">Exterior and interior cleaning</p><br><br>
             </div>
           </div>
         </a>
       </div>
       <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-2">
         <a href="booking-form.php?serviceID=4" style="text-decoration : none; color: black;">
-          <div class="card" style="width: 20rem; margin: auto;">
-            <img class="card-img-top" src="../Imgs/Assets/premium-car-wash.jfif">
+          <div class="card" style="width: 17rem; margin: auto;">
+            <img class="card-img-top" src="../Imgs/Assets/premium-car-wash.jfif" style="width: 17rem; margin: auto;">
             <div class="card-body">
               <p class="product-name">Premium</p>
               <p class="product-price">10000 MMK</p><br>
