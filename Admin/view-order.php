@@ -10,15 +10,39 @@ if (isset($_SESSION['AdminID'])) {
     echo "<script>window.location = 'login.php'</script>";
 }
 
-if (isset($_POST['btnShipped'])) {
-    $orderID = $_POST['inputOrderID'];
-    $update = "UPDATE Orders SET OrderStatus = 'Shipped' WHERE OrderID = '$orderID'";
-    if ($connection->query($update)) {
-        echo "<script>alert('Set Order As Shipped');</script>";
-        echo "<script>window.location = 'orders.php';</script>";
-    } else {
-        echo $connection->error;
+if (isset($_GET['UserID'])) {
+  $redirectFile = 'profile.php';
+  $redirectName = 'Profile';
+  $userID = $_GET['UserID'];
+
+  // get order information
+  if (isset($_GET['OrderID']))
+    $orderID = $_GET['OrderID'];
+  $select = "SELECT * FROM Orders o, Users u, Products p, OrderProduct op
+                WHERE o.OrderID = op.OrderID
+                AND p.ProductID = op.ProductID
+                AND o.UserID = u.UserID
+                AND o.OrderID = '$orderID'";
+  $query = $connection->query($select);
+
+  // get delivery fee
+  $freeDeliStatus = "";
+  $selectDeli = "SELECT * FROM Memberships m, MembershipTypes mt 
+    WHERE m.MembershipTypeID = mt.MembershipTypeID
+    AND m.UserID = '$userID'
+    AND m.MembershipStatus = 'Active'";
+  $queryDeli = $connection->query($selectDeli);
+  if ($queryDeli->num_rows > 0) {
+    while ($row = $queryDeli->fetch_assoc()) {
+      $freeDeliStatus = $row['FreeDeliveryStatus'];
     }
+  }
+  $deliFee = $freeDeliStatus == "Free" ? 0 : 2000;
+} else {
+  $redirectFile = 'login.php';
+  $redirectName = 'Login';
+  echo "<script>alert('Please login first.');</script>";
+  echo "<script>window.location = 'login.php';</script>";
 }
 ?>
 <!DOCTYPE html>
@@ -113,43 +137,77 @@ if (isset($_POST['btnShipped'])) {
         <div id="content" class="p-4 p-md-5 pt-5">
             <div class="container">
                 <h2 class="pageHeader">Orders</h2>
-                <form action="orders.php" method="POST">
-                    <table id="tableID" class="table table-bordered table-striped table-responsive-stack">
-                        <thead class="tableHeaders">
-                            <tr>
-                                <th>OrderID</th>
-                                <th>UserID</th>
-                                <th>Name</th>
-                                <th>Address</th>
-                                <th>Date</th>
-                                <th>Discount</th>
-                                <th>Cost</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            while ($row = $query->fetch_assoc()) {
-                                echo
-                                "<tr>
-                                    <input type='text' name='inputOrderID' value='$row[OrderID]' hidden>
-                                    <td>$row[OrderID]</td>
-                                    <td>$row[UserID]</td>
-                                    <td>$row[Name]</td>
-                                    <td>$row[Address]</td>
-                                    <td>$row[Date]</td>
-                                    <td>$row[Discount]%</td>
-                                    <td>$row[Cost] MMK</td>
-                                    <td>
-                                    <a href = 'view-order.php?UserID=$row[UserID]&OrderID=$row[OrderID]'><input type='button' class='actionButton' style='background-color: transparent;' value='View'></a>
-                                    |
-                                    <input type='submit' class='actionButton' name='btnShipped' style='background-color: transparent;' value='Set As Shipped'></td>
-                                </tr>";
-                            }
-                            ?>
-                        </tbody>
-                    </table>
-                </form>
+                    <div class="card">
+                      <div class="row">
+                        <div class="col-md-12 cart p-5">
+                          <p><?php echo $orderID ?></p>
+                          <?php
+                          while ($row = $query->fetch_assoc()) {
+                            $discount = $row['Discount'];
+                            $total = $row['Cost'];
+                            $multiploedPrice = $row['Price'] * $row['Quantity'];
+                            $orderStatus = $row['OrderStatus'];
+                            $ratingHiddenStatus = ($orderStatus == 'Delivered') ? '' : 'hidden';
+                            echo
+                            "<div class='row border-top border-bottom'>
+                                <div class='row main align-items-center'>
+                                  <div class='col-2 p-3'>
+                                    <img class='img-fluid' src='$row[ProductImage]' width='300px' height='500px'>
+                                  </div>
+                                  <div class='col'>
+                                    <div class='row text-muted'>$row[ProductName]</div>
+                                    <div class='row'>$row[Price] MMK</div>
+                                  </div>
+                                  <div class='col'>$row[Quantity]</div>
+                                  <div class='col'>$multiploedPrice MMK</div>
+                                  <div class='col' $ratingHiddenStatus>
+                                    <a href='rate-product.php?ProductID=$row[ProductID]&OrderID=$row[OrderID]'><button type='button' class='btn btn-link'>Rate this product</button></a>
+                                  </div>
+                                </div>
+                              </div>";
+                          }
+                          ?>
+                          <div class='row main align-items-center'>
+                            <div class='col-2 p-3'>
+                            </div>
+                            <div class='col'>
+                            </div>
+                            <div class='col'>
+                              <a>&nbsp;</a><br>
+                              <a><span class='text-muted'>Delivery</span></a><br>
+                              <a>&nbsp;</a><br>
+                            </div>
+                            <div class='col'><?php echo $deliFee ?> MMK</div>
+                          </div>
+                          <div class='row main align-items-center'>
+                            <div class='col-2 p-3'>
+                            </div>
+                            <div class='col'>
+                            </div>
+                            <div class='col'>
+                              <a>&nbsp;</a><br>
+                              <a><span class='text-muted'>Discount</span></a><br>
+                              <a>&nbsp;</a><br>
+                            </div>
+                            <div class='col'><?php echo $discount ?>%</div>
+                          </div>
+                          <div class='row main align-items-center'>
+                            <div class='col-2 p-3'>
+                            </div>
+                            <div class='col'>
+                            </div>
+                            <div class='col'>
+                              <a>&nbsp;</a><br>
+                              <a><span class='text-muted'>Total Cost</span></a><br>
+                              <a>&nbsp;</a><br>
+                              <a>&nbsp;</a><br>
+                            </div>
+                            <div class='col' style='background-color: #00cfe7; padding: 10px;'><?php echo $total ?></div>
+                          </div>
+                        </div>
+                        <br>
+                      </div>
+                    </div>
             </div>
         </div>
     </div>

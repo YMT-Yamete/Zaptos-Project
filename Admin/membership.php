@@ -134,7 +134,7 @@ if (isset($_POST['btnRemove'])) {
                             <?php
                             $membershipSts = "";
                             while ($row = $query->fetch_assoc()) {
-                                $membershipSts = (date('Y-m-d')>$row['MembershipStatus'])?$row['MembershipStatus']:"Expired";
+                                $membershipSts = (date('Y-m-d')>$row['EndDate'])?$row['MembershipStatus']:"Expired";
                                 echo
                                 "
                                 <input type='text' name='inputMembershipID' value='$row[MembershipID]' hidden> 

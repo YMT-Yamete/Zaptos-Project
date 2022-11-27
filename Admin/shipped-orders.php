@@ -144,7 +144,10 @@ if (isset($_POST['btnDelivered'])) {
                                     <td>$row[Date]</td>
                                     <td>$row[Discount]%</td>
                                     <td>$row[Cost] MMK</td>
-                                    <td><input type='submit' class='actionButton' name='btnDelivered' style='background-color: transparent;' value='Set As Delivered'></td>
+                                    <td>
+                                    <a href = 'view-order.php?UserID=$row[UserID]&OrderID=$row[OrderID]'><input type='button' class='actionButton' style='background-color: transparent;' value='View'></a>
+                                    |
+                                    <input type='submit' class='actionButton' name='btnDelivered' style='background-color: transparent;' value='Set As Delivered'></td>
                                 </tr>";
                             }
                             ?>

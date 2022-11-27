@@ -21,6 +21,7 @@ if (isset($_SESSION['UserID'])) {
       $date = $row['Date'];
       $time = $row['Time'];
       $discount = $row['Discount'];
+      $bookingStatus = $row['BookingStatus'];
     }
     $select = "SELECT * FROM Services WHERE ServiceID = '$serviceID'";
     $query = $connection->query($select);
@@ -207,7 +208,8 @@ if (isset($_POST['btnCancel'])) {
             <input type="text" name="inputBookingID" value='<?php echo $bookingID; ?>' hidden>
             <div class="back-to-shop">
               <br>
-              <button style="float: right; border:none;" type="submit" name="btnCancel">
+              <?php $cancelHiddenStatus = ($bookingStatus == 'Finished') ? 'hidden' : '' ?>
+              <button style="float: right; border:none;" type="submit" name="btnCancel" <?php echo $cancelHiddenStatus ?>>
                 <span style="float: right; background-color: red; color: white; padding: 20px;">
                   Cancel Booking &nbsp;
                 </span>
